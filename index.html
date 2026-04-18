@@ -2,1563 +2,1174 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-<title>Marvelous Quizzes</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Super Quiz — Marvel & DC</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;700;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --marvel-red: #e23636;
-    --dc-blue: #0476d0;
-    --gold: #ffd700;
-    --dark: #0a0a0f;
-    --darker: #050508;
-    --card-bg: rgba(255,255,255,0.04);
-    --border: rgba(255,255,255,0.08);
-    --text: #f0f0f0;
-    --muted: #777;
-    --font-display: 'Syne', sans-serif;
-    --font-body: 'DM Sans', sans-serif;
-    --font-mono: 'Space Mono', monospace;
-  }
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root{
+  --red:#FF3030;--blue:#1488FC;--gold:#FFD600;--green:#00E676;
+  --bg:#07070E;--card:#12121F;--card2:#1A1A2E;--border:rgba(255,255,255,.08);
+  --t1:#fff;--t2:#9898B8;--t3:#505068;
+  --fh:'Unbounded',sans-serif;--fb:'DM Sans',sans-serif;
+  --ease:cubic-bezier(.4,0,.2,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow-x:hidden}
+body{background:var(--bg);color:var(--t1);font-family:var(--fb);min-height:100vh;-webkit-font-smoothing:antialiased;line-height:1.5}
 
-  body {
-    background: var(--darker);
-    color: var(--text);
-    font-family: var(--font-body);
-    min-height: 100vh;
-    overflow-x: hidden;
-    position: relative;
-    -webkit-font-smoothing: antialiased;
-  }
+/* ═══ GLOW BG ═══ */
+.glow{position:fixed;border-radius:50%;filter:blur(130px);pointer-events:none;z-index:0}
+.glow-r{width:500px;height:500px;background:rgba(255,48,48,.14);top:-150px;left:-150px;animation:g1 13s ease-in-out infinite alternate}
+.glow-b{width:500px;height:500px;background:rgba(20,136,252,.14);bottom:-150px;right:-150px;animation:g2 15s ease-in-out infinite alternate}
+@keyframes g1{to{transform:translate(60px,40px)}}
+@keyframes g2{to{transform:translate(-50px,-70px)}}
+#stars{position:fixed;inset:0;z-index:0;pointer-events:none}
+.st{position:absolute;border-radius:50%;background:#fff;animation:tw var(--d,3s) infinite alternate}
+@keyframes tw{from{opacity:.04}to{opacity:.7}}
 
-  /* STARFIELD BG */
-  #starfield {
-    position: fixed; inset: 0; z-index: 0; pointer-events: none;
-    background: radial-gradient(ellipse at 20% 50%, rgba(226,54,54,0.07) 0%, transparent 60%),
-                radial-gradient(ellipse at 80% 50%, rgba(4,118,208,0.07) 0%, transparent 60%),
-                var(--darker);
-  }
-  .star {
-    position: absolute; border-radius: 50%;
-    background: white; animation: twinkle var(--d, 3s) infinite alternate;
-  }
-  @keyframes twinkle { from { opacity: 0.1; } to { opacity: 0.8; } }
+/* ═══ IG BANNER ═══ */
+#ig-bar{
+  position:fixed;top:14px;left:50%;transform:translateX(-50%);z-index:9999;
+  display:flex;align-items:center;gap:9px;
+  background:rgba(10,10,22,.93);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  border:1px solid rgba(255,255,255,.11);border-radius:50px;
+  padding:8px 14px 8px 10px;box-shadow:0 6px 36px rgba(0,0,0,.6);
+  animation:sdown .7s cubic-bezier(.34,1.56,.64,1) both;
+  white-space:nowrap;max-width:calc(100vw - 20px);
+}
+@keyframes sdown{from{opacity:0;transform:translateX(-50%) translateY(-24px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+.ig-a{display:flex;align-items:center;gap:8px;text-decoration:none;color:#fff}
+.ig-ic{width:28px;height:28px;border-radius:7px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;
+  background:linear-gradient(135deg,#f09433 0%,#e6683c 25%,#dc2743 50%,#cc2366 75%,#bc1888 100%)}
+.ig-tx{font-size:.8rem;font-weight:700;font-family:var(--fb)}
+.ig-hd{font-size:.77rem;color:var(--gold);font-weight:500}
+.ig-x{background:none;border:none;color:var(--t3);cursor:pointer;font-size:15px;padding:3px 0 3px 6px;line-height:1;transition:.2s;flex-shrink:0}
+.ig-x:hover{color:#fff}
 
-  /* NOISE OVERLAY */
-  body::after {
-    content: ''; position: fixed; inset: 0; z-index: 1; pointer-events: none;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
-    opacity: 0.4;
-  }
+/* ═══ SCREENS ═══ */
+.scr{display:none;position:relative;z-index:1;min-height:100vh;flex-direction:column;align-items:center;justify-content:center;padding:24px 18px}
+.scr.on{display:flex;animation:fu .38s var(--ease) both}
+@keyframes fu{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
 
-  /* SUPPORT POPUP */
-  #support-popup {
-    position: fixed; inset: 0; z-index: 9999;
-    display: flex; align-items: center; justify-content: center;
-    background: rgba(0,0,0,0.85);
-    backdrop-filter: blur(8px);
-    animation: fadeIn 0.5s ease;
-    padding: 20px;
-  }
-  .popup-box {
-    background: linear-gradient(135deg, #0a0a0f 0%, #12121a 100%);
-    border: 1px solid rgba(255,215,0,0.3);
-    border-radius: 24px;
-    padding: 36px 40px;
-    text-align: center;
-    position: relative;
-    max-width: 400px;
-    width: 100%;
-    box-shadow: 0 0 60px rgba(255,215,0,0.1), 0 0 120px rgba(226,54,54,0.1);
-    animation: popIn 0.5s cubic-bezier(0.34,1.56,0.64,1);
-  }
-  @keyframes popIn { from { transform: scale(0.6); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-  .popup-logo {
-    font-family: var(--font-display);
-    font-size: 1.8rem; font-weight: 800;
-    background: linear-gradient(90deg, var(--gold), #ff9500);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    margin-bottom: 6px;
-    letter-spacing: -0.5px;
-  }
-  .popup-sub { color: var(--muted); font-size: 0.85rem; margin-bottom: 24px; font-family: var(--font-body); }
-  .popup-support {
-    font-size: 1.2rem; font-weight: 600;
-    color: white; margin-bottom: 4px;
-    font-family: var(--font-display);
-  }
-  .popup-platform-label {
-    font-size: 0.72rem; color: var(--muted); letter-spacing: 3px;
-    text-transform: uppercase; margin-bottom: 6px;
-    font-family: var(--font-mono);
-  }
-  .popup-handle {
-    font-family: var(--font-mono);
-    font-size: 1.05rem; color: var(--gold);
-    text-shadow: 0 0 20px rgba(255,215,0,0.5);
-    margin-bottom: 28px;
-    animation: glow 2s ease-in-out infinite alternate;
-  }
-  @keyframes glow { from { text-shadow: 0 0 10px rgba(255,215,0,0.3); } to { text-shadow: 0 0 30px rgba(255,215,0,0.8); } }
-  .popup-insta-icon {
-    display: inline-block; margin-right: 6px; font-size: 1.1rem;
-    vertical-align: middle;
-  }
-  .popup-close {
-    position: absolute; top: 14px; right: 18px;
-    background: none; border: none; color: var(--muted);
-    font-size: 1.4rem; cursor: pointer; transition: color 0.2s;
-    line-height: 1; padding: 4px;
-  }
-  .popup-close:hover { color: white; }
-  .popup-skip {
-    background: linear-gradient(135deg, var(--gold), #ff9500);
-    border: none; border-radius: 50px; padding: 13px 36px;
-    font-family: var(--font-display); font-size: 1rem; font-weight: 700;
-    color: #000; cursor: pointer; letter-spacing: 0.5px;
-    transition: transform 0.2s, box-shadow 0.2s;
-    box-shadow: 0 4px 20px rgba(255,215,0,0.3);
-    width: 100%;
-  }
-  .popup-skip:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(255,215,0,0.5); }
+/* ═══ HOME ═══ */
+#home{padding:90px 18px 44px;text-align:center;gap:0}
+.h-ey{font-family:var(--fb);font-size:.68rem;letter-spacing:5px;color:var(--gold);text-transform:uppercase;margin-bottom:14px}
+.h-t1{font-family:var(--fh);font-weight:900;font-size:clamp(3rem,13vw,7rem);line-height:.9;letter-spacing:-4px;
+  background:linear-gradient(160deg,#fff 0%,#bbb 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;display:block}
+.h-t2{font-family:var(--fb);font-weight:800;font-size:clamp(.85rem,3.5vw,1.2rem);letter-spacing:5px;text-transform:uppercase;margin-top:10px;
+  background:linear-gradient(90deg,var(--red),var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent;display:block}
+.h-desc{color:var(--t2);font-size:.9rem;margin:20px auto 40px;max-width:300px;line-height:1.65}
+.h-cards{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;width:100%;max-width:600px}
+@media(max-width:540px){.h-cards{flex-direction:column;align-items:center}}
 
-  /* MAIN WRAPPER */
-  #app { position: relative; z-index: 2; }
+/* ═══ CARD (home) ═══ */
+.hc{
+  background:var(--card);border:1px solid var(--border);border-radius:20px;
+  padding:26px 22px;flex:1;min-width:210px;max-width:265px;
+  cursor:pointer;text-align:left;position:relative;overflow:hidden;
+  transition:transform .3s cubic-bezier(.34,1.56,.64,1),border-color .25s,box-shadow .25s;
+}
+.hc::before{content:'';position:absolute;inset:0;opacity:0;transition:.3s;
+  background:radial-gradient(circle at 50% 0%,var(--acc,rgba(255,255,255,.06)),transparent 70%)}
+.hc:hover{transform:translateY(-6px) scale(1.02)}.hc:hover::before{opacity:1}.hc:active{transform:scale(.97)}
+.hc.rv{--acc:rgba(255,48,48,.12)}.hc.rv:hover{border-color:var(--red);box-shadow:0 18px 55px rgba(255,48,48,.18)}
+.hc.bl{--acc:rgba(20,136,252,.12)}.hc.bl:hover{border-color:var(--blue);box-shadow:0 18px 55px rgba(20,136,252,.18)}
+.hc-ic{font-size:2rem;margin-bottom:13px;display:block}
+.hc-tt{font-family:var(--fh);font-size:1.05rem;font-weight:700;letter-spacing:-.4px;margin-bottom:7px}
+.hc-ds{font-size:.82rem;color:var(--t2);line-height:1.55}
+.pill{display:inline-block;margin-top:11px;padding:3px 11px;border-radius:30px;font-size:.62rem;font-weight:700;letter-spacing:1.5px;font-family:var(--fb)}
+.p-r{background:rgba(255,48,48,.15);color:#FF7575;border:1px solid rgba(255,48,48,.28)}
+.p-g{background:rgba(255,214,0,.12);color:var(--gold);border:1px solid rgba(255,214,0,.28)}
+@media(max-width:540px){.hc{max-width:92vw;width:92vw}}
 
-  /* SCREENS */
-  .screen { display: none; min-height: 100vh; }
-  .screen.active { display: flex; flex-direction: column; }
+/* ═══ UNIVERSE SELECT ═══ */
+#universe{padding:90px 18px 44px;text-align:center;gap:0}
+.sec-tt{font-family:var(--fh);font-size:clamp(1.5rem,5vw,2.4rem);font-weight:700;letter-spacing:-1px;margin-bottom:8px}
+.sec-sb{color:var(--t2);font-size:.88rem;margin-bottom:32px}
+.u-cards{display:flex;gap:14px;flex-wrap:wrap;justify-content:center;width:100%;max-width:720px}
+@media(max-width:600px){.u-cards{flex-direction:column;align-items:center}}
+.uc{
+  background:var(--card);border:1px solid var(--border);border-radius:18px;
+  padding:26px 20px;width:200px;cursor:pointer;text-align:left;
+  position:relative;overflow:hidden;
+  transition:transform .3s cubic-bezier(.34,1.56,.64,1),border-color .25s,box-shadow .25s;
+}
+.uc:hover{transform:translateY(-5px)}.uc:active{transform:scale(.97)}
+.uc.mv:hover{border-color:var(--red);box-shadow:0 16px 50px rgba(255,48,48,.22)}
+.uc.dc:hover{border-color:var(--blue);box-shadow:0 16px 50px rgba(20,136,252,.22)}
+.uc.mx:hover{border-color:var(--gold);box-shadow:0 16px 50px rgba(255,214,0,.22)}
+.uc::after{content:'';position:absolute;inset:0;opacity:0;transition:.3s;
+  background:radial-gradient(circle at 50% 10%,var(--ua,transparent),transparent 70%)}
+.uc:hover::after{opacity:1}
+.uc.mv{--ua:rgba(255,48,48,.1)}.uc.dc{--ua:rgba(20,136,252,.1)}.uc.mx{--ua:rgba(255,214,0,.08)}
+.uc-ic{font-size:2.2rem;margin-bottom:12px}
+.uc-tt{font-family:var(--fh);font-size:1.05rem;font-weight:700;letter-spacing:-.3px;margin-bottom:5px}
+.uc-ds{font-size:.78rem;color:var(--t2);line-height:1.5}
+@media(max-width:600px){.uc{width:min(88vw,300px)}}
+.u-shine {
+  position:absolute;top:0;left:-60%;width:40%;height:100%;
+  background:linear-gradient(105deg,transparent 20%,rgba(255,255,255,.06) 50%,transparent 80%);
+  transform:skewX(-15deg);transition:.6s;
+}
+.uc:hover .u-shine{left:120%}
 
-  /* ===== HOME SCREEN ===== */
-  #home {
-    align-items: center; justify-content: center;
-    padding: 40px 20px; text-align: center;
-    min-height: 100vh;
-  }
-  .home-title-wrap { margin-bottom: 20px; position: relative; }
-  .home-eyebrow {
-    font-family: var(--font-mono); font-size: 0.7rem;
-    letter-spacing: 5px; color: var(--gold); margin-bottom: 16px;
-    text-transform: uppercase; opacity: 0.8;
-  }
-  .home-title {
-    font-family: var(--font-display);
-    font-size: clamp(3.2rem, 13vw, 6.5rem);
-    font-weight: 800;
-    line-height: 0.95;
-    letter-spacing: -2px;
-    background: linear-gradient(180deg, #fff 20%, #888 100%);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-    position: relative;
-  }
-  .home-title .word-marvelous {
-    display: block;
-    font-size: clamp(2.4rem, 10vw, 5rem);
-    letter-spacing: -1px;
-  }
-  .home-title .word-quizzes {
-    display: block;
-    font-size: clamp(3.2rem, 13vw, 6.5rem);
-  }
-  .home-title span.red { background: linear-gradient(90deg, var(--marvel-red), #ff7070); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-  .home-title span.blue { background: linear-gradient(90deg, var(--dc-blue), #4db8ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-  .home-title span.gold { background: linear-gradient(90deg, var(--gold), #ff9500); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-  .home-sub {
-    font-size: 1rem; color: var(--muted); margin-bottom: 44px;
-    max-width: 340px; margin-left: auto; margin-right: auto;
-    line-height: 1.6; font-weight: 300;
-  }
-  .home-cards {
-    display: flex; gap: 16px; flex-wrap: wrap;
-    justify-content: center; max-width: 640px;
-    width: 100%;
-  }
-  .home-card {
-    background: var(--card-bg);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 28px 28px;
-    width: 280px;
-    cursor: pointer;
-    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), border-color 0.3s, box-shadow 0.3s;
-    position: relative; overflow: hidden;
-    text-align: left;
-  }
-  .home-card::before {
-    content: ''; position: absolute; inset: 0;
-    opacity: 0; transition: opacity 0.3s;
-    background: radial-gradient(circle at 50% 0%, var(--card-accent, rgba(255,255,255,0.1)) 0%, transparent 70%);
-  }
-  .home-card:hover { transform: translateY(-8px) scale(1.02); }
-  .home-card:hover::before { opacity: 1; }
-  .home-card.bot { --card-accent: rgba(226,54,54,0.15); }
-  .home-card.bot:hover { border-color: var(--marvel-red); box-shadow: 0 20px 60px rgba(226,54,54,0.2); }
-  .home-card.online { --card-accent: rgba(4,118,208,0.15); }
-  .home-card.online:hover { border-color: var(--dc-blue); box-shadow: 0 20px 60px rgba(4,118,208,0.2); }
-  .card-icon {
-    font-size: 2.2rem; margin-bottom: 14px;
-    display: block;
-  }
-  .card-title {
-    font-family: var(--font-display);
-    font-size: 1.4rem; font-weight: 700; letter-spacing: -0.3px;
-    margin-bottom: 8px;
-  }
-  .card-desc { font-size: 0.85rem; color: var(--muted); line-height: 1.6; font-weight: 300; }
-  .badge-soon {
-    display: inline-block; margin-top: 10px;
-    background: rgba(4,118,208,0.2); border: 1px solid rgba(4,118,208,0.4);
-    color: #4db8ff; font-size: 0.65rem; font-weight: 700;
-    padding: 3px 10px; border-radius: 20px; letter-spacing: 2px;
-    font-family: var(--font-mono);
-  }
+/* ═══ SETUP ═══ */
+#setup{padding:90px 18px 44px}
+.setup-wrap{background:var(--card);border:1px solid var(--border);border-radius:24px;padding:34px 30px;max-width:430px;width:100%}
+@media(max-width:460px){.setup-wrap{padding:22px 16px;border-radius:18px}}
+.setup-title{font-family:var(--fh);font-size:1.5rem;font-weight:700;letter-spacing:-.5px;margin-bottom:28px;text-align:center}
+.setup-mode-tag{display:inline-block;padding:4px 14px;border-radius:30px;font-size:.65rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:22px;font-family:var(--fb);margin-left:auto;margin-right:auto;display:block;width:fit-content}
+.tag-mv{background:rgba(255,48,48,.15);color:#FF7575;border:1px solid rgba(255,48,48,.28)}
+.tag-dc{background:rgba(20,136,252,.15);color:#6BB5FF;border:1px solid rgba(20,136,252,.28)}
+.tag-mx{background:rgba(255,214,0,.12);color:var(--gold);border:1px solid rgba(255,214,0,.28)}
 
-  /* HERO LOGOS FLOATING */
-  .float-logos {
-    position: fixed; inset: 0; pointer-events: none; z-index: 1;
-    overflow: hidden;
-  }
-  .float-logo {
-    position: absolute; font-family: var(--font-display);
-    font-size: 8rem; font-weight: 800; opacity: 0.03; user-select: none;
-    animation: floatUp var(--dur, 20s) var(--delay, 0s) linear infinite;
-  }
-  @keyframes floatUp {
-    from { transform: translateY(110vh) rotate(-15deg); }
-    to { transform: translateY(-20vh) rotate(-15deg); }
-  }
+.field{margin-bottom:18px}
+.fl{display:block;font-size:.67rem;font-weight:700;letter-spacing:2px;color:var(--t3);text-transform:uppercase;margin-bottom:8px;font-family:var(--fb)}
+.fi{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:12px;padding:13px 15px;color:#fff;font-family:var(--fb);font-size:.95rem;font-weight:500;outline:none;transition:.2s;min-height:50px}
+.fi:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(255,214,0,.09)}
+.fi::placeholder{color:var(--t3)}
+.ctr{display:flex;align-items:center;gap:12px}
+.cb{width:48px;height:48px;border-radius:50%;border:1px solid var(--border);background:rgba(255,255,255,.04);color:#fff;font-size:1.3rem;cursor:pointer;transition:.2s;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.cb:hover{border-color:var(--gold);background:rgba(255,214,0,.09)}
+.cv{flex:1;text-align:center;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:12px;padding:11px;font-family:'Courier New',monospace;font-size:1.25rem;color:var(--gold);font-weight:700}
+.lg{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.lb{padding:12px 8px;border-radius:12px;border:1px solid var(--border);background:rgba(255,255,255,.03);color:var(--t2);cursor:pointer;font-family:var(--fb);font-size:.85rem;font-weight:700;transition:.2s;text-transform:uppercase;min-height:50px}
+.lb:hover{border-color:rgba(255,255,255,.25);color:#fff}
+.lb.on.easy{border-color:#4ade80;background:rgba(74,222,128,.1);color:#4ade80}
+.lb.on.normal{border-color:#60a5fa;background:rgba(96,165,250,.1);color:#60a5fa}
+.lb.on.medium{border-color:#fb923c;background:rgba(251,146,60,.1);color:#fb923c}
+.lb.on.hard{border-color:#f87171;background:rgba(248,113,113,.1);color:#f87171}
+.btn-start{width:100%;padding:15px;margin-top:14px;background:linear-gradient(135deg,var(--gold),#FF9500);border:none;border-radius:13px;font-family:var(--fh);font-size:1rem;font-weight:700;letter-spacing:.3px;color:#000;cursor:pointer;transition:.2s;box-shadow:0 4px 22px rgba(255,214,0,.3);min-height:54px}
+.btn-start:hover{transform:translateY(-3px);box-shadow:0 10px 38px rgba(255,214,0,.48)}
+.btn-back{background:none;border:1px solid var(--border);border-radius:50px;padding:11px 24px;color:var(--t2);cursor:pointer;font-family:var(--fb);font-size:.86rem;font-weight:600;transition:.2s;margin-top:10px;width:100%;min-height:46px}
+.btn-back:hover{border-color:#fff;color:#fff}
 
-  /* ===== MODE SELECT ===== */
-  #mode-select {
-    align-items: center; justify-content: center;
-    padding: 40px 20px; text-align: center;
-  }
-  .section-title {
-    font-family: var(--font-display);
-    font-size: clamp(1.8rem, 5vw, 3rem);
-    font-weight: 800; letter-spacing: -1px; margin-bottom: 8px;
-  }
-  .section-sub { color: var(--muted); margin-bottom: 36px; font-size: 0.95rem; font-weight: 300; }
-  .mode-cards {
-    display: flex; gap: 16px; flex-wrap: wrap;
-    justify-content: center; max-width: 860px;
-    width: 100%;
-  }
-  .mode-card {
-    background: var(--card-bg); border: 1px solid var(--border);
-    border-radius: 16px; padding: 26px 24px;
-    width: 240px; cursor: pointer;
-    transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1), border-color 0.3s, box-shadow 0.3s;
-    position: relative; overflow: hidden; text-align: left;
-  }
-  .mode-card:hover { transform: translateY(-6px); }
-  .mode-card.marvel:hover { border-color: var(--marvel-red); box-shadow: 0 16px 50px rgba(226,54,54,0.25); }
-  .mode-card.dc:hover { border-color: var(--dc-blue); box-shadow: 0 16px 50px rgba(4,118,208,0.25); }
-  .mode-card.mixed:hover { border-color: var(--gold); box-shadow: 0 16px 50px rgba(255,215,0,0.25); }
-  .mode-card-icon { font-size: 2rem; margin-bottom: 12px; }
-  .mode-card-title { font-family: var(--font-display); font-size: 1.3rem; font-weight: 700; letter-spacing: -0.3px; margin-bottom: 6px; }
-  .mode-card-count { font-size: 0.8rem; color: var(--muted); font-weight: 300; }
-  .mode-pill {
-    display: inline-block; padding: 3px 10px; border-radius: 20px;
-    font-size: 0.65rem; font-weight: 700; letter-spacing: 1.5px; margin-top: 10px;
-    font-family: var(--font-mono);
-  }
-  .pill-red { background: rgba(226,54,54,0.2); color: #ff6b6b; border: 1px solid rgba(226,54,54,0.3); }
-  .pill-blue { background: rgba(4,118,208,0.2); color: #4db8ff; border: 1px solid rgba(4,118,208,0.3); }
-  .pill-gold { background: rgba(255,215,0,0.15); color: var(--gold); border: 1px solid rgba(255,215,0,0.3); }
-  .back-btn {
-    background: none; border: 1px solid var(--border); color: var(--muted);
-    padding: 10px 24px; border-radius: 50px; cursor: pointer;
-    font-family: var(--font-body); font-size: 0.9rem;
-    transition: all 0.2s; margin-top: 28px; letter-spacing: 0.3px;
-  }
-  .back-btn:hover { border-color: white; color: white; }
+/* ═══ QUIZ ═══ */
+#quiz{padding:0;justify-content:flex-start;align-items:stretch;min-height:100vh}
+.qbar{
+  position:sticky;top:0;z-index:20;
+  background:rgba(7,7,14,.88);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  border-bottom:1px solid var(--border);
+  padding:12px 18px;display:flex;align-items:center;gap:11px;
+}
+.qb-logo{font-family:var(--fh);font-size:.95rem;font-weight:700;color:var(--gold);flex-shrink:0;letter-spacing:-.3px}
+.qb-prog{flex:1;min-width:0}
+.qb-lbs{display:flex;justify-content:space-between;font-size:.6rem;color:var(--t3);margin-bottom:4px;font-family:'Courier New',monospace}
+.qb-track{height:3px;background:rgba(255,255,255,.08);border-radius:3px;overflow:hidden}
+.qb-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--gold),#FF9500);transition:width .5s var(--ease)}
+.qb-sc{font-family:'Courier New',monospace;font-size:.76rem;color:var(--gold);flex-shrink:0;white-space:nowrap}
 
-  /* ===== SETUP SCREEN ===== */
-  #setup {
-    align-items: center; justify-content: center;
-    padding: 40px 20px;
-  }
-  .setup-box {
-    background: var(--card-bg); border: 1px solid var(--border);
-    border-radius: 24px; padding: 40px 44px;
-    max-width: 460px; width: 100%;
-    backdrop-filter: blur(10px);
-  }
-  .setup-box h2 {
-    font-family: var(--font-display); font-size: 1.8rem; font-weight: 800;
-    letter-spacing: -0.5px; margin-bottom: 28px;
-    text-align: center;
-  }
-  .form-group { margin-bottom: 22px; }
-  .form-label {
-    display: block; font-size: 0.72rem; font-weight: 600;
-    letter-spacing: 2px; color: var(--muted);
-    text-transform: uppercase; margin-bottom: 8px;
-    font-family: var(--font-mono);
-  }
-  .form-input {
-    width: 100%; background: rgba(255,255,255,0.05);
-    border: 1px solid var(--border); border-radius: 10px;
-    padding: 12px 16px; color: white;
-    font-family: var(--font-body); font-size: 1rem;
-    transition: border-color 0.2s, box-shadow 0.2s; outline: none;
-  }
-  .form-input:focus { border-color: var(--gold); box-shadow: 0 0 0 3px rgba(255,215,0,0.1); }
-  .level-grid {
-    display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;
-  }
-  .level-btn {
-    padding: 12px; border-radius: 10px;
-    border: 1px solid var(--border); background: rgba(255,255,255,0.03);
-    color: var(--muted); cursor: pointer; font-family: var(--font-body);
-    font-size: 0.9rem; font-weight: 500; letter-spacing: 0.3px;
-    transition: all 0.2s; text-transform: uppercase;
-  }
-  .level-btn:hover { border-color: rgba(255,255,255,0.3); color: white; }
-  .level-btn.selected.easy { border-color: #4ade80; background: rgba(74,222,128,0.1); color: #4ade80; }
-  .level-btn.selected.normal { border-color: #60a5fa; background: rgba(96,165,250,0.1); color: #60a5fa; }
-  .level-btn.selected.medium { border-color: #fb923c; background: rgba(251,146,60,0.1); color: #fb923c; }
-  .level-btn.selected.hard { border-color: #f87171; background: rgba(248,113,113,0.1); color: #f87171; }
-  .bot-count-wrap { display: flex; align-items: center; gap: 12px; }
-  .count-btn {
-    width: 42px; height: 42px; border-radius: 50%;
-    border: 1px solid var(--border); background: rgba(255,255,255,0.05);
-    color: white; font-size: 1.2rem; cursor: pointer; transition: all 0.2s;
-    display: flex; align-items: center; justify-content: center;
-    font-family: var(--font-body);
-  }
-  .count-btn:hover { border-color: var(--gold); background: rgba(255,215,0,0.1); }
-  .count-display {
-    flex: 1; text-align: center;
-    background: rgba(255,255,255,0.05); border: 1px solid var(--border);
-    border-radius: 10px; padding: 10px;
-    font-family: var(--font-mono); font-size: 1.2rem; color: var(--gold);
-  }
-  .start-btn {
-    width: 100%; padding: 16px;
-    background: linear-gradient(135deg, var(--gold), #ff9500);
-    border: none; border-radius: 12px;
-    font-family: var(--font-display); font-size: 1.2rem; font-weight: 700;
-    letter-spacing: 1px; color: #000; cursor: pointer;
-    margin-top: 10px;
-    transition: transform 0.2s, box-shadow 0.2s;
-    box-shadow: 0 4px 20px rgba(255,215,0,0.3);
-  }
-  .start-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 40px rgba(255,215,0,0.5); }
+.qlayout{display:grid;grid-template-columns:1fr 255px;min-height:calc(100vh - 60px)}
+@media(max-width:700px){.qlayout{grid-template-columns:1fr;min-height:auto}}
+.qmain{padding:22px 18px;overflow-y:auto}
+@media(min-width:701px){.qmain{padding:28px 30px}}
+.qside{border-left:1px solid var(--border);padding:18px 14px;overflow-y:auto;background:rgba(0,0,0,.18)}
+@media(max-width:700px){.qside{display:none}}
 
-  /* ===== QUIZ SCREEN ===== */
-  #quiz {
-    padding: 0;
-    min-height: 100vh;
-  }
-  .quiz-header {
-    padding: 12px 20px;
-    display: flex; align-items: center; justify-content: space-between;
-    border-bottom: 1px solid var(--border);
-    background: rgba(0,0,0,0.5);
-    backdrop-filter: blur(10px);
-    position: sticky; top: 0; z-index: 10;
-    gap: 12px;
-  }
-  .quiz-logo {
-    font-family: var(--font-display);
-    font-size: 1.1rem; font-weight: 800; letter-spacing: -0.3px;
-    color: var(--gold); white-space: nowrap;
-  }
-  .quiz-progress-wrap { flex: 1; max-width: 260px; margin: 0 8px; }
-  .quiz-progress-label {
-    display: flex; justify-content: space-between;
-    font-size: 0.68rem; color: var(--muted); margin-bottom: 5px;
-    font-family: var(--font-mono);
-  }
-  .quiz-progress-bar {
-    height: 3px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden;
-  }
-  .quiz-progress-fill {
-    height: 100%; border-radius: 4px;
-    background: linear-gradient(90deg, var(--gold), #ff9500);
-    transition: width 0.5s ease;
-  }
-  .quiz-score-display {
-    font-family: var(--font-mono); font-size: 0.8rem;
-    color: var(--gold); white-space: nowrap;
-  }
-  .quiz-body {
-    display: grid; grid-template-columns: 1fr 280px;
-    gap: 0; height: calc(100vh - 57px);
-  }
-  .quiz-main { padding: 24px; overflow-y: auto; }
-  .quiz-sidebar {
-    border-left: 1px solid var(--border);
-    padding: 18px; overflow-y: auto;
-    background: rgba(0,0,0,0.2);
-  }
+/* TIMER */
+.tw{display:flex;justify-content:center;margin-bottom:18px}
+.to{position:relative;width:78px;height:78px}
+.tsvg{transform:rotate(-90deg)}
+.tbg{fill:none;stroke:rgba(255,255,255,.07);stroke-width:6}
+.tarc{fill:none;stroke-width:6;stroke-linecap:round;stroke:var(--gold);stroke-dasharray:226;stroke-dashoffset:0;transition:stroke-dashoffset 1s linear,stroke .4s}
+.tnum{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:'Courier New',monospace;font-size:1.35rem;font-weight:700;line-height:1}
+.tlb{font-size:.48rem;letter-spacing:2px;color:var(--t3);text-transform:uppercase;margin-top:1px}
 
-  /* TIMER */
-  .timer-wrap { text-align: center; margin-bottom: 20px; }
-  .timer-ring-wrap {
-    position: relative; width: 80px; height: 80px; margin: 0 auto 6px;
-  }
-  .timer-ring { transform: rotate(-90deg); }
-  .timer-bg { fill: none; stroke: rgba(255,255,255,0.08); stroke-width: 5; }
-  .timer-arc {
-    fill: none; stroke-width: 5; stroke-linecap: round;
-    stroke: var(--gold);
-    stroke-dasharray: 220; stroke-dashoffset: 0;
-    transition: stroke-dashoffset 1s linear, stroke 0.5s;
-  }
-  .timer-num {
-    position: absolute; inset: 0; display: flex;
-    align-items: center; justify-content: center;
-    font-family: var(--font-mono); font-size: 1.5rem;
-    font-weight: 700;
-  }
-  .timer-label { font-size: 0.65rem; letter-spacing: 3px; color: var(--muted); text-transform: uppercase; font-family: var(--font-mono); }
+/* QUESTION */
+.qbadge{display:inline-block;padding:4px 13px;border-radius:30px;font-size:.62rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:11px;font-family:var(--fb);background:rgba(96,165,250,.12);color:#93C5FD;border:1px solid rgba(96,165,250,.22)}
+.qno{font-family:'Courier New',monospace;font-size:.67rem;color:var(--t3);margin-bottom:9px;letter-spacing:1px}
+.qtxt{font-family:var(--fh);font-size:clamp(.95rem,2.6vw,1.3rem);font-weight:600;line-height:1.5;letter-spacing:-.2px;color:#fff;margin-bottom:22px}
+.agrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:460px){.agrid{grid-template-columns:1fr}}
+.abtn{
+  background:var(--card);border:1px solid var(--border);border-radius:14px;
+  padding:13px 14px;color:#fff;cursor:pointer;text-align:left;
+  font-family:var(--fb);font-size:.9rem;font-weight:500;
+  transition:.22s;position:relative;overflow:hidden;min-height:54px;
+  display:flex;align-items:center;gap:10px;line-height:1.35;
+}
+.abtn:not(.done):hover{border-color:rgba(255,214,0,.42);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.32)}
+.abtn:not(.done):active{transform:scale(.97)}
+.altr{width:26px;height:26px;border-radius:7px;background:rgba(255,255,255,.07);display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700;font-family:'Courier New',monospace;flex-shrink:0}
+.abtn.correct{border-color:#4ade80!important;background:rgba(74,222,128,.13)!important;color:#4ade80!important}
+.abtn.correct .altr{background:rgba(74,222,128,.22)}
+.abtn.wrong{border-color:#f87171!important;background:rgba(248,113,113,.1)!important;color:#f87171!important}
+.abtn.wrong .altr{background:rgba(248,113,113,.2)}
+.abtn.done{cursor:default}
 
-  /* QUESTION */
-  .q-type-badge {
-    display: inline-block; padding: 4px 12px; border-radius: 20px;
-    font-size: 0.68rem; font-weight: 700; letter-spacing: 1.5px;
-    text-transform: uppercase; margin-bottom: 14px;
-    font-family: var(--font-mono);
-  }
-  .q-type-normal { background: rgba(96,165,250,0.15); color: #60a5fa; border: 1px solid rgba(96,165,250,0.3); }
-  .q-type-hard { background: rgba(248,113,113,0.15); color: #f87171; border: 1px solid rgba(248,113,113,0.3); }
-  .q-number {
-    font-family: var(--font-mono); font-size: 0.68rem;
-    color: var(--muted); margin-bottom: 8px; letter-spacing: 2px;
-  }
-  .q-text {
-    font-size: clamp(1.05rem, 2.2vw, 1.4rem);
-    font-weight: 500; line-height: 1.5;
-    margin-bottom: 28px; color: white;
-    font-family: var(--font-display);
-  }
-  .answers-grid {
-    display: grid; grid-template-columns: 1fr 1fr;
-    gap: 10px;
-  }
-  .ans-btn {
-    background: var(--card-bg); border: 1px solid var(--border);
-    border-radius: 12px; padding: 14px 16px;
-    color: white; cursor: pointer; text-align: left;
-    font-family: var(--font-body); font-size: 0.95rem; font-weight: 400;
-    transition: all 0.25s; position: relative; overflow: hidden;
-    line-height: 1.4;
-  }
-  .ans-btn::before {
-    content: ''; position: absolute; inset: 0; opacity: 0;
-    background: radial-gradient(circle at 50% 50%, rgba(255,215,0,0.1) 0%, transparent 70%);
-    transition: opacity 0.3s;
-  }
-  .ans-btn:not(.revealed):hover {
-    border-color: rgba(255,215,0,0.4);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
-  }
-  .ans-btn:not(.revealed):hover::before { opacity: 1; }
-  .ans-btn.correct { border-color: #4ade80 !important; background: rgba(74,222,128,0.15) !important; color: #4ade80 !important; animation: correctPulse 0.5s ease; }
-  .ans-btn.wrong { border-color: #f87171 !important; background: rgba(248,113,113,0.1) !important; color: #f87171 !important; }
-  .ans-btn.revealed { cursor: default; }
-  .ans-letter {
-    display: inline-block; width: 22px; height: 22px;
-    background: rgba(255,255,255,0.08); border-radius: 5px;
-    text-align: center; line-height: 22px; font-size: 0.72rem;
-    font-weight: 700; margin-right: 8px; font-family: var(--font-mono);
-    flex-shrink: 0;
-  }
-  @keyframes correctPulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.03); }
-    100% { transform: scale(1); }
-  }
+/* SIDEBAR */
+.stt{font-family:var(--fh);font-size:.95rem;font-weight:700;color:var(--gold);margin-bottom:12px;padding-bottom:9px;border-bottom:1px solid var(--border)}
+.pc{background:rgba(255,255,255,.025);border:1px solid var(--border);border-radius:12px;padding:10px 12px;margin-bottom:8px;transition:border-color .3s}
+.pc.pa{border-color:rgba(74,222,128,.25)}
+.pr{display:flex;align-items:center;gap:8px}
+.pav{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:.8rem;flex-shrink:0;font-family:var(--fh)}
+.pnm{font-family:var(--fh);font-weight:700;font-size:.82rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ppt{font-family:'Courier New',monospace;font-size:.67rem;color:var(--gold)}
+.pst{font-size:.66rem;color:var(--t3);margin-top:3px;height:13px;overflow:hidden}
+.tkg{display:flex;gap:3px;align-items:center}
+.dk{width:4px;height:4px;border-radius:50%;background:var(--t3);animation:bl 1.1s infinite}
+.dk:nth-child(2){animation-delay:.2s}.dk:nth-child(3){animation-delay:.4s}
+@keyframes bl{0%,80%,100%{opacity:.2}40%{opacity:1}}
 
-  /* SIDEBAR - PLAYERS */
-  .sidebar-title {
-    font-family: var(--font-display); font-size: 1.1rem; font-weight: 700;
-    letter-spacing: -0.2px; color: var(--gold); margin-bottom: 14px;
-    border-bottom: 1px solid var(--border); padding-bottom: 10px;
-  }
-  .player-card {
-    background: rgba(255,255,255,0.03); border: 1px solid var(--border);
-    border-radius: 10px; padding: 10px 12px; margin-bottom: 8px;
-    transition: border-color 0.3s;
-  }
-  .player-card.answered { border-color: rgba(74,222,128,0.3); }
-  .player-row { display: flex; align-items: center; gap: 8px; }
-  .player-avatar {
-    width: 34px; height: 34px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-weight: 700; font-size: 0.85rem; flex-shrink: 0;
-    font-family: var(--font-display);
-  }
-  .player-info { flex: 1; min-width: 0; }
-  .player-name { font-weight: 600; font-size: 0.88rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: var(--font-display); }
-  .player-score { font-family: var(--font-mono); font-size: 0.72rem; color: var(--gold); }
-  .player-status {
-    font-size: 0.68rem; color: var(--muted); margin-top: 4px;
-    height: 14px; overflow: hidden; font-family: var(--font-body);
-  }
-  .bot-thinking {
-    display: flex; gap: 3px; align-items: center;
-  }
-  .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--muted); animation: blink 1s infinite; }
-  .dot:nth-child(2) { animation-delay: 0.2s; }
-  .dot:nth-child(3) { animation-delay: 0.4s; }
-  @keyframes blink { 0%,80%,100% { opacity: 0.2; } 40% { opacity: 1; } }
+/* MOBILE CHIPS */
+.mchips{display:none;padding:0 14px 14px;gap:8px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.mchips::-webkit-scrollbar{display:none}
+@media(max-width:700px){.mchips{display:flex}}
+.mch{background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:50px;padding:6px 12px;display:flex;align-items:center;gap:6px;white-space:nowrap;flex-shrink:0;transition:.3s}
+.mch.pa{border-color:rgba(74,222,128,.3)}
+.mchav{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.63rem;font-weight:800;font-family:var(--fh)}
+.mchnm{font-size:.75rem;font-weight:700;font-family:var(--fh)}
+.mchpt{font-family:'Courier New',monospace;font-size:.63rem;color:var(--gold)}
 
-  /* RESULT FEEDBACK */
-  #result-feedback {
-    position: fixed; top: 80px; left: 50%; transform: translateX(-50%);
-    z-index: 100; pointer-events: none;
-    font-family: var(--font-display); font-size: 2rem; font-weight: 800;
-    letter-spacing: 1px; opacity: 0;
-    text-shadow: 0 0 30px currentColor;
-    white-space: nowrap;
-  }
-  #result-feedback.show { animation: feedbackAnim 1.5s ease forwards; }
-  @keyframes feedbackAnim {
-    0% { opacity: 0; transform: translateX(-50%) translateY(0) scale(0.5); }
-    20% { opacity: 1; transform: translateX(-50%) translateY(-20px) scale(1.1); }
-    60% { opacity: 1; transform: translateX(-50%) translateY(-30px) scale(1); }
-    100% { opacity: 0; transform: translateX(-50%) translateY(-60px) scale(0.9); }
-  }
+/* TOAST */
+#toast{position:fixed;top:74px;left:50%;transform:translateX(-50%);z-index:500;pointer-events:none;
+  font-family:var(--fh);font-size:1.6rem;font-weight:700;letter-spacing:-.3px;
+  opacity:0;text-shadow:0 0 28px currentColor;white-space:nowrap}
+#toast.on{animation:ta 1.6s ease forwards}
+@keyframes ta{
+  0%{opacity:0;transform:translateX(-50%) scale(.5) translateY(0)}
+  18%{opacity:1;transform:translateX(-50%) scale(1.07) translateY(-16px)}
+  55%{opacity:1;transform:translateX(-50%) scale(1) translateY(-24px)}
+  100%{opacity:0;transform:translateX(-50%) scale(.95) translateY(-52px)}
+}
 
-  /* ===== RESULTS SCREEN ===== */
-  #results {
-    align-items: center; justify-content: center;
-    padding: 40px 20px; text-align: center;
-  }
-  .results-crown { font-size: 3.5rem; margin-bottom: 10px; animation: bounce 1s ease infinite alternate; }
-  @keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-10px); } }
-  .results-title {
-    font-family: var(--font-display);
-    font-size: clamp(1.8rem, 5vw, 3rem);
-    font-weight: 800; letter-spacing: -1px; margin-bottom: 6px;
-  }
-  .results-winner {
-    font-size: 1.1rem; color: var(--gold); margin-bottom: 28px;
-    font-weight: 400;
-  }
-  .results-table {
-    background: var(--card-bg); border: 1px solid var(--border);
-    border-radius: 16px; overflow: hidden;
-    max-width: 480px; width: 100%; margin: 0 auto 28px;
-  }
-  .rt-row {
-    display: grid; grid-template-columns: 40px 1fr 80px 80px;
-    padding: 13px 18px; border-bottom: 1px solid var(--border);
-    align-items: center; gap: 10px;
-  }
-  .rt-row:last-child { border-bottom: none; }
-  .rt-row.header { background: rgba(255,215,0,0.05); }
-  .rt-rank { font-family: var(--font-mono); font-size: 0.8rem; font-weight: 700; }
-  .rt-name { text-align: left; font-weight: 600; font-family: var(--font-display); font-size: 0.95rem; }
-  .rt-score { font-family: var(--font-mono); color: var(--gold); font-size: 0.85rem; }
-  .rt-correct { color: #4ade80; font-size: 0.85rem; font-family: var(--font-mono); }
-  .rank-medal { font-size: 1.1rem; }
-  .results-actions { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
-  .btn-primary {
-    background: linear-gradient(135deg, var(--gold), #ff9500);
-    border: none; border-radius: 50px;
-    padding: 13px 32px;
-    font-family: var(--font-display); font-size: 1rem; font-weight: 700;
-    letter-spacing: 0.5px; color: #000; cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
-    box-shadow: 0 4px 20px rgba(255,215,0,0.3);
-  }
-  .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 10px 40px rgba(255,215,0,0.5); }
-  .btn-secondary {
-    background: none; border: 1px solid var(--border);
-    border-radius: 50px; padding: 13px 32px;
-    font-family: var(--font-display); font-size: 1rem; font-weight: 700;
-    letter-spacing: 0.5px; color: white; cursor: pointer;
-    transition: all 0.2s;
-  }
-  .btn-secondary:hover { border-color: white; background: rgba(255,255,255,0.05); }
+/* ═══ RESULTS ═══ */
+#results{padding:90px 18px 44px;text-align:center;gap:0}
+.rcrown{font-size:3.8rem;animation:bob .9s ease infinite alternate;display:block;margin-bottom:10px}
+@keyframes bob{from{transform:translateY(0) rotate(-6deg)}to{transform:translateY(-12px) rotate(6deg)}}
+.rtt{font-family:var(--fh);font-size:clamp(1.7rem,5vw,2.7rem);font-weight:700;letter-spacing:-1px;margin-bottom:7px}
+.rwn{font-size:.95rem;color:var(--gold);margin-bottom:26px;font-weight:600}
+.rtbl{background:var(--card);border:1px solid var(--border);border-radius:18px;overflow:hidden;max-width:470px;width:100%;margin:0 auto 26px}
+.rth,.rtr{display:grid;grid-template-columns:42px 1fr 75px 75px;padding:12px 16px;gap:8px;align-items:center;border-bottom:1px solid var(--border)}
+.rth{background:rgba(255,214,0,.04)}.rtr:last-child{border-bottom:none}
+.rth span{font-size:.62rem;font-weight:700;letter-spacing:1.5px;color:var(--t3);text-transform:uppercase;font-family:var(--fb)}
+.rrk{font-family:'Courier New',monospace;font-size:.88rem;font-weight:700}
+.rnm{font-family:var(--fh);font-size:.86rem;font-weight:700;text-align:left}
+.rsc{font-family:'Courier New',monospace;color:var(--gold);font-size:.8rem}
+.rcr{color:#4ade80;font-size:.8rem;font-family:'Courier New',monospace}
+.rbtns{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.btn-main{background:linear-gradient(135deg,var(--gold),#FF9500);border:none;border-radius:50px;padding:13px 32px;font-family:var(--fh);font-size:.92rem;font-weight:700;color:#000;cursor:pointer;transition:.2s;box-shadow:0 4px 20px rgba(255,214,0,.28);min-height:50px}
+.btn-main:hover{transform:translateY(-3px);box-shadow:0 10px 38px rgba(255,214,0,.48)}
+.btn-ghost{background:none;border:1px solid var(--border);border-radius:50px;padding:13px 32px;font-family:var(--fh);font-size:.92rem;font-weight:700;color:#fff;cursor:pointer;transition:.2s;min-height:50px}
+.btn-ghost:hover{border-color:#fff;background:rgba(255,255,255,.05)}
 
-  /* CONFETTI */
-  .confetti-piece {
-    position: fixed; width: 8px; height: 8px; pointer-events: none;
-    animation: confettiFall var(--dur, 3s) var(--delay, 0s) linear forwards;
-    z-index: 9000;
-  }
-  @keyframes confettiFall {
-    0% { transform: translateY(-20px) rotate(0deg) translateX(0); opacity: 1; }
-    100% { transform: translateY(110vh) rotate(720deg) translateX(var(--drift, 0px)); opacity: 0; }
-  }
+/* CONFETTI */
+.cf{position:fixed;width:8px;height:8px;pointer-events:none;animation:cff var(--d,3s) var(--dl,0s) linear forwards;z-index:8000;border-radius:var(--br,2px)}
+@keyframes cff{0%{transform:translateY(-10px) rotate(0);opacity:1}100%{transform:translateY(110vh) rotate(900deg) translateX(var(--dx,0));opacity:0}}
 
-  /* ===== MOBILE RESPONSIVE ===== */
-  @media (max-width: 768px) {
-    /* HOME */
-    #home { padding: 30px 16px; justify-content: center; }
-    .home-title .word-marvelous { font-size: clamp(2rem, 9vw, 3.5rem); }
-    .home-title .word-quizzes { font-size: clamp(2.8rem, 12vw, 5rem); }
-    .home-cards { flex-direction: column; align-items: stretch; max-width: 340px; gap: 12px; }
-    .home-card { width: 100%; padding: 22px 22px; }
-    .home-sub { margin-bottom: 28px; }
-    .home-eyebrow { letter-spacing: 3px; font-size: 0.65rem; }
-
-    /* MODE */
-    .mode-cards { flex-direction: column; align-items: center; }
-    .mode-card { width: 100%; max-width: 320px; }
-
-    /* SETUP */
-    .setup-box { padding: 24px 20px; border-radius: 20px; }
-    .setup-box h2 { font-size: 1.5rem; margin-bottom: 22px; }
-
-    /* QUIZ */
-    .quiz-header { padding: 10px 14px; gap: 8px; }
-    .quiz-logo { font-size: 0.95rem; }
-    .quiz-score-display { font-size: 0.72rem; }
-    .quiz-progress-label { font-size: 0.6rem; }
-    .quiz-body { grid-template-columns: 1fr; height: auto; min-height: calc(100vh - 51px); }
-    .quiz-sidebar { display: none; }
-    .quiz-main { padding: 16px; padding-bottom: 80px; }
-
-    /* Mobile timer - horizontal */
-    .timer-wrap {
-      display: flex; align-items: center; gap: 12px;
-      text-align: left; margin-bottom: 16px;
-      background: rgba(255,255,255,0.03);
-      border: 1px solid var(--border);
-      border-radius: 12px; padding: 10px 14px;
-    }
-    .timer-ring-wrap { width: 50px; height: 50px; margin: 0; }
-    .timer-num { font-size: 1.1rem; }
-    .timer-label { font-size: 0.58rem; letter-spacing: 2px; }
-    .timer-text-wrap { display: flex; flex-direction: column; }
-
-    /* Answers - single column on small mobile */
-    .answers-grid { grid-template-columns: 1fr; gap: 8px; }
-    .ans-btn { padding: 13px 14px; font-size: 0.92rem; }
-    .q-text { font-size: 1.05rem; margin-bottom: 20px; line-height: 1.5; }
-    .q-type-badge { font-size: 0.62rem; margin-bottom: 10px; }
-
-    /* Mobile floating players bar */
-    .mobile-players-bar {
-      display: flex !important;
-      position: fixed; bottom: 0; left: 0; right: 0;
-      background: rgba(10,10,15,0.95);
-      border-top: 1px solid var(--border);
-      backdrop-filter: blur(16px);
-      padding: 8px 16px;
-      gap: 8px; overflow-x: auto;
-      z-index: 20;
-      -webkit-overflow-scrolling: touch;
-    }
-    .mobile-player-chip {
-      display: flex; align-items: center; gap: 6px;
-      background: rgba(255,255,255,0.05);
-      border: 1px solid var(--border);
-      border-radius: 50px; padding: 5px 10px;
-      white-space: nowrap; flex-shrink: 0;
-      font-size: 0.78rem; font-family: var(--font-body);
-    }
-    .mobile-player-chip.answered { border-color: rgba(74,222,128,0.4); }
-    .mobile-player-chip .chip-avatar {
-      width: 20px; height: 20px; border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 0.65rem; font-weight: 700; flex-shrink: 0;
-      font-family: var(--font-display);
-    }
-    .mobile-player-chip .chip-score {
-      font-family: var(--font-mono); font-size: 0.7rem; color: var(--gold);
-    }
-
-    /* Results */
-    .results-table { margin: 0 0 20px; }
-    .rt-row { padding: 11px 14px; }
-    .rt-row.header .rt-name,
-    .rt-row.header .rt-score,
-    .rt-row.header .rt-correct { font-size: 0.7rem; }
-    .results-actions { gap: 10px; }
-    .btn-primary, .btn-secondary { padding: 12px 24px; font-size: 0.95rem; }
-  }
-
-  /* Extra small */
-  @media (max-width: 380px) {
-    .home-title .word-marvelous { font-size: 1.9rem; }
-    .home-title .word-quizzes { font-size: 2.6rem; }
-    .ans-btn { font-size: 0.88rem; padding: 12px 12px; }
-    .q-text { font-size: 0.98rem; }
-  }
-
-  /* Desktop: hide mobile bar */
-  .mobile-players-bar { display: none; }
-
-  /* Transitions */
-  .screen { animation: none; }
-  .screen.entering { animation: screenIn 0.4s ease; }
-  @keyframes screenIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
-  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-  /* Tap highlight */
-  * { -webkit-tap-highlight-color: transparent; }
-
-  /* Scrollbar */
-  ::-webkit-scrollbar { width: 4px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }
+/* Safe area */
+@supports(padding:max(0px)){
+  .qbar{padding-top:max(12px,env(safe-area-inset-top))}
+  #home,#universe,#setup,#results{padding-bottom:max(44px,env(safe-area-inset-bottom))}
+}
 </style>
 </head>
 <body>
 
-<!-- STARFIELD -->
-<div id="starfield"></div>
-<div class="float-logos">
-  <div class="float-logo" style="left:5%;color:#e23636;--dur:22s;--delay:0s;">MARVEL</div>
-  <div class="float-logo" style="left:50%;color:#0476d0;--dur:28s;--delay:5s;">DC</div>
-  <div class="float-logo" style="left:75%;color:#ffd700;--dur:18s;--delay:10s;">MARVEL</div>
-  <div class="float-logo" style="left:25%;color:#0476d0;--dur:24s;--delay:3s;">DC</div>
+<!-- GLOWS -->
+<div class="glow glow-r"></div>
+<div class="glow glow-b"></div>
+<div id="stars"></div>
+
+<!-- IG BANNER -->
+<div id="ig-bar">
+  <a href="https://www.instagram.com/mp4.ae_" target="_blank" rel="noopener" class="ig-a">
+    <div class="ig-ic">📷</div>
+    <div>
+      <div class="ig-tx">Support us on Instagram</div>
+      <div class="ig-hd">@mp4.ae_</div>
+    </div>
+  </a>
+  <button class="ig-x" onclick="closeIG()">✕</button>
 </div>
 
-<!-- SUPPORT POPUP -->
-<div id="support-popup">
-  <div class="popup-box">
-    <button class="popup-close" onclick="closePopup()">✕</button>
-    <div class="popup-logo">⚡ Marvelous Quizzes</div>
-    <div class="popup-sub">The Ultimate Superhero Quiz Experience</div>
-    <div class="popup-support">Support Us on Instagram</div>
-    <div class="popup-platform-label">📸 Instagram</div>
-    <div class="popup-handle"><span class="popup-insta-icon">📸</span>@mp4.ae_</div>
-    <button class="popup-skip" onclick="closePopup()">Let's Play! 🚀</button>
-  </div>
-</div>
+<!-- TOAST -->
+<div id="toast"></div>
 
-<!-- RESULT FEEDBACK -->
-<div id="result-feedback"></div>
-
-<!-- APP -->
-<div id="app">
-  <!-- HOME -->
-  <div id="home" class="screen active">
-    <div class="home-title-wrap">
-      <div class="home-eyebrow">⚡ The Ultimate Superhero Experience</div>
-      <div class="home-title">
-        <span class="word-marvelous"><span class="red">Mar</span><span class="blue">vel</span><span class="gold">ous</span></span>
-        <span class="word-quizzes">Quizzes</span>
-      </div>
+<!-- ════════════════════════════════════
+     SCREEN 1 — HOME
+════════════════════════════════════ -->
+<div id="home" class="scr on">
+  <span class="h-ey">⚡ The Ultimate Superhero Quiz</span>
+  <span class="h-t1">SUPER<br>QUIZ</span>
+  <span class="h-t2">Marvel • DC • 1000+ Questions</span>
+  <p class="h-desc">Challenge AI opponents. 25 questions. 20 seconds each. One winner.</p>
+  <div class="h-cards">
+    <div class="hc rv" onclick="goTo('universe')">
+      <span class="hc-ic">🤖</span>
+      <div class="hc-tt">Play with Bot</div>
+      <div class="hc-ds">Challenge AI across difficulty levels. Pick Marvel, DC or Mixed!</div>
+      <span class="pill p-r">OFFLINE</span>
     </div>
-    <div class="home-sub">Test your knowledge of the Marvel & DC universe. 1000+ questions await.</div>
-    <div class="home-cards">
-      <div class="home-card bot" onclick="goTo('mode-select')">
-        <span class="card-icon">🤖</span>
-        <div class="card-title">Play With Bot</div>
-        <div class="card-desc">Challenge AI opponents across difficulty levels. Prove you're the ultimate fan.</div>
-        <div class="mode-pill pill-red">OFFLINE</div>
-      </div>
-      <div class="home-card online" onclick="showComingSoon()">
-        <span class="card-icon">👥</span>
-        <div class="card-title">Play With Friends</div>
-        <div class="card-desc">Challenge your friends in real-time multiplayer battles.</div>
-        <div class="badge-soon">COMING SOON</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODE SELECT -->
-  <div id="mode-select" class="screen">
-    <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 16px;text-align:center;">
-      <div class="section-title">Choose Your <span style="color:var(--gold)">Universe</span></div>
-      <div class="section-sub">Pick a quiz category to challenge yourself</div>
-      <div class="mode-cards">
-        <div class="mode-card marvel" onclick="selectMode('marvel')">
-          <div class="mode-card-icon">🔴</div>
-          <div class="mode-card-title">Marvel Quiz</div>
-          <div class="mode-card-count">Iron Man, Spider-Man, Thor & more</div>
-          <div class="mode-pill pill-red">MARVEL ONLY</div>
-        </div>
-        <div class="mode-card dc" onclick="selectMode('dc')">
-          <div class="mode-card-icon">🔵</div>
-          <div class="mode-card-title">DC Quiz</div>
-          <div class="mode-card-count">Batman, Superman, Flash & more</div>
-          <div class="mode-pill pill-blue">DC ONLY</div>
-        </div>
-        <div class="mode-card mixed" onclick="selectMode('mixed')">
-          <div class="mode-card-icon">⚡</div>
-          <div class="mode-card-title">Mixed Questions</div>
-          <div class="mode-card-count">Best of both universes combined</div>
-          <div class="mode-pill pill-gold">MARVEL + DC</div>
-        </div>
-      </div>
-      <button class="back-btn" onclick="goTo('home')">← Back to Home</button>
-    </div>
-  </div>
-
-  <!-- SETUP -->
-  <div id="setup" class="screen">
-    <div class="setup-box">
-      <h2 id="setup-title">QUIZ SETUP</h2>
-      <div class="form-group">
-        <label class="form-label">Your Name</label>
-        <input type="text" id="player-name" class="form-input" placeholder="Enter your hero name..." maxlength="20" autocomplete="off">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Number of Bots</label>
-        <div class="bot-count-wrap">
-          <button class="count-btn" onclick="changeBotCount(-1)">−</button>
-          <div class="count-display" id="bot-count-display">1</div>
-          <button class="count-btn" onclick="changeBotCount(1)">+</button>
-        </div>
-      </div>
-      <div class="form-group">
-        <label class="form-label">Difficulty Level</label>
-        <div class="level-grid">
-          <button class="level-btn easy" onclick="selectLevel('easy')">😊 Easy</button>
-          <button class="level-btn normal" onclick="selectLevel('normal')">😐 Normal</button>
-          <button class="level-btn medium" onclick="selectLevel('medium')">😤 Medium</button>
-          <button class="level-btn hard" onclick="selectLevel('hard')">💀 Hard</button>
-        </div>
-      </div>
-      <button class="start-btn" onclick="startQuiz()">⚡ START QUIZ</button>
-      <button class="back-btn" style="width:100%;margin-top:12px;" onclick="goTo('mode-select')">← Back</button>
-    </div>
-  </div>
-
-  <!-- QUIZ -->
-  <div id="quiz" class="screen">
-    <div class="quiz-header">
-      <div class="quiz-logo">⚡ MQ</div>
-      <div class="quiz-progress-wrap">
-        <div class="quiz-progress-label">
-          <span id="q-progress-text">Q 1 / 25</span>
-          <span id="q-type-label">NORMAL</span>
-        </div>
-        <div class="quiz-progress-bar"><div class="quiz-progress-fill" id="progress-fill" style="width:4%"></div></div>
-      </div>
-      <div class="quiz-score-display">🏆 <span id="header-score">0</span></div>
-    </div>
-    <div class="quiz-body">
-      <div class="quiz-main">
-        <div class="timer-wrap">
-          <div class="timer-ring-wrap">
-            <svg class="timer-ring" width="80" height="80" viewBox="0 0 80 80">
-              <circle class="timer-bg" cx="40" cy="40" r="35"/>
-              <circle class="timer-arc" id="timer-arc" cx="40" cy="40" r="35"/>
-            </svg>
-            <div class="timer-num" id="timer-num">20</div>
-          </div>
-          <div class="timer-text-wrap">
-            <div class="timer-label">SECONDS LEFT</div>
-          </div>
-        </div>
-        <div id="q-type-badge" class="q-type-badge q-type-normal">Normal Question</div>
-        <div class="q-number" id="q-number">QUESTION 1 OF 25</div>
-        <div class="q-text" id="q-text">Loading question...</div>
-        <div class="answers-grid" id="answers-grid"></div>
-      </div>
-      <div class="quiz-sidebar">
-        <div class="sidebar-title">Players</div>
-        <div id="players-list"></div>
-      </div>
-    </div>
-    <!-- Mobile players bar -->
-    <div class="mobile-players-bar" id="mobile-players-bar"></div>
-  </div>
-
-  <!-- RESULTS -->
-  <div id="results" class="screen">
-    <div class="results-crown">👑</div>
-    <div class="results-title">Quiz <span style="color:var(--gold)">Complete!</span></div>
-    <div class="results-winner" id="results-winner">Player wins!</div>
-    <div class="results-table" id="results-table"></div>
-    <div class="results-actions">
-      <button class="btn-primary" onclick="playAgain()">🔄 Play Again</button>
-      <button class="btn-secondary" onclick="goTo('home')">🏠 Home</button>
+    <div class="hc bl" onclick="cSoon()">
+      <span class="hc-ic">👥</span>
+      <div class="hc-tt">Play with Friends</div>
+      <div class="hc-ds">Real-time multiplayer battles with friends anywhere.</div>
+      <span class="pill p-g">COMING SOON</span>
     </div>
   </div>
 </div>
 
+<!-- ════════════════════════════════════
+     SCREEN 2 — UNIVERSE SELECT
+════════════════════════════════════ -->
+<div id="universe" class="scr">
+  <div class="sec-tt">Choose Your <span style="color:var(--gold)">Universe</span></div>
+  <div class="sec-sb">Pick the quiz category you want to play</div>
+  <div class="u-cards">
+
+    <div class="uc mv" onclick="pickUniverse('marvel')">
+      <div class="u-shine"></div>
+      <div class="uc-ic">🔴</div>
+      <div class="uc-tt">Marvel Quiz</div>
+      <div class="uc-ds">Iron Man, Spider-Man, Thor, X-Men &amp; more</div>
+      <span class="pill p-r" style="margin-top:12px">MARVEL ONLY</span>
+    </div>
+
+    <div class="uc dc" onclick="pickUniverse('dc')">
+      <div class="u-shine"></div>
+      <div class="uc-ic">🔵</div>
+      <div class="uc-tt">DC Quiz</div>
+      <div class="uc-ds">Batman, Superman, Flash, Wonder Woman &amp; more</div>
+      <span class="pill" style="background:rgba(20,136,252,.15);color:#6BB5FF;border:1px solid rgba(20,136,252,.28);margin-top:12px">DC ONLY</span>
+    </div>
+
+    <div class="uc mx" onclick="pickUniverse('mixed')">
+      <div class="u-shine"></div>
+      <div class="uc-ic">⚡</div>
+      <div class="uc-tt">Mixed Quiz</div>
+      <div class="uc-ds">Best of both universes — Marvel + DC combined</div>
+      <span class="pill p-g" style="margin-top:12px">MARVEL + DC</span>
+    </div>
+
+  </div>
+  <button class="btn-back" style="max-width:420px;margin-top:24px" onclick="goTo('home')">← Back to Home</button>
+</div>
+
+<!-- ════════════════════════════════════
+     SCREEN 3 — SETUP
+════════════════════════════════════ -->
+<div id="setup" class="scr">
+  <div class="setup-wrap">
+    <div class="setup-title" id="setup-title">⚡ QUIZ SETUP</div>
+    <div id="setup-tag" class="setup-mode-tag tag-mx">MIXED — MARVEL + DC</div>
+
+    <div class="field">
+      <label class="fl">Your Hero Name</label>
+      <input type="text" id="pname" class="fi" placeholder="Enter your name…" maxlength="18" autocomplete="off">
+    </div>
+
+    <div class="field">
+      <label class="fl">Number of Bots</label>
+      <div class="ctr">
+        <button class="cb" onclick="adjBot(-1)">−</button>
+        <div class="cv" id="bot-val">1</div>
+        <button class="cb" onclick="adjBot(1)">+</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="fl">Difficulty</label>
+      <div class="lg">
+        <button class="lb easy"   onclick="pickLvl('easy')">😊 Easy</button>
+        <button class="lb normal" onclick="pickLvl('normal')">😐 Normal</button>
+        <button class="lb medium" onclick="pickLvl('medium')">😤 Medium</button>
+        <button class="lb hard"   onclick="pickLvl('hard')">💀 Hard</button>
+      </div>
+    </div>
+
+    <button class="btn-start" onclick="startGame()">⚡ START QUIZ</button>
+    <button class="btn-back" onclick="goTo('universe')">← Back</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════
+     SCREEN 4 — QUIZ
+════════════════════════════════════ -->
+<div id="quiz" class="scr" style="justify-content:flex-start">
+  <div class="qbar">
+    <div class="qb-logo">⚡ SQ</div>
+    <div class="qb-prog">
+      <div class="qb-lbs"><span id="qb-num">Q1/25</span><span id="qb-lbl">1 POINT</span></div>
+      <div class="qb-track"><div class="qb-fill" id="qb-fill" style="width:4%"></div></div>
+    </div>
+    <div class="qb-sc">🏆<span id="qb-sc">0</span></div>
+  </div>
+
+  <div class="qlayout">
+    <div class="qmain">
+      <!-- Timer -->
+      <div class="tw">
+        <div class="to">
+          <svg class="tsvg" width="78" height="78" viewBox="0 0 78 78">
+            <circle class="tbg" cx="39" cy="39" r="33"/>
+            <circle class="tarc" id="tarc" cx="39" cy="39" r="33"/>
+          </svg>
+          <div class="tnum"><span id="tnum">20</span><span class="tlb">sec</span></div>
+        </div>
+      </div>
+      <span class="qbadge" id="qbadge">⭐ 1 Point</span>
+      <div class="qno" id="qno">QUESTION 1 OF 25</div>
+      <div class="qtxt" id="qtxt">Loading…</div>
+      <div class="agrid" id="agrid"></div>
+    </div>
+
+    <!-- Desktop sidebar -->
+    <div class="qside">
+      <div class="stt">Scoreboard</div>
+      <div id="splayers"></div>
+    </div>
+  </div>
+
+  <!-- Mobile player chips -->
+  <div class="mchips" id="mchips"></div>
+</div>
+
+<!-- ════════════════════════════════════
+     SCREEN 5 — RESULTS
+════════════════════════════════════ -->
+<div id="results" class="scr">
+  <span class="rcrown">👑</span>
+  <div class="rtt">Quiz <span style="color:var(--gold)">Complete!</span></div>
+  <div class="rwn" id="rwn"></div>
+  <div class="rtbl" id="rtbl"></div>
+  <div class="rbtns">
+    <button class="btn-main" onclick="playAgain()">🔄 Play Again</button>
+    <button class="btn-ghost" onclick="goTo('home')">🏠 Home</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════
+     JAVASCRIPT
+════════════════════════════════════ -->
 <script>
-// ======================== QUESTIONS DATABASE ========================
-const MARVEL_QUESTIONS_NORMAL = [
-  {q:"Which metal is Captain America's shield primarily made of?",a:["Vibranium","Adamantium","Titanium","Steel"],c:0},
-  {q:"Who is Tony Stark's AI assistant in the Iron Man suit?",a:["JARVIS","HAL","ARIA","NEXUS"],c:0},
-  {q:"What is Thor's hammer called?",a:["Mjolnir","Gungnir","Stormbreaker","Excalibur"],c:0},
-  {q:"Which Infinity Stone is the Mind Stone?",a:["Yellow Stone","Blue Stone","Red Stone","Green Stone"],c:0},
-  {q:"What is Peter Parker's superhero name?",a:["Spider-Man","Iron Boy","Web Head","Wall Crawler"],c:0},
-  {q:"In which city does Tony Stark primarily live?",a:["Malibu","New York","Chicago","Gotham"],c:0},
-  {q:"What are the Guardians of the Galaxy's first mission about?",a:["An Infinity Stone","A weapon cache","Rescuing Gamora","Fighting Thanos"],c:0},
-  {q:"Who played Black Widow in the MCU?",a:["Scarlett Johansson","Charlize Theron","Mila Kunis","Jessica Alba"],c:0},
-  {q:"What is the name of Thor's home realm?",a:["Asgard","Midgard","Jotunheim","Valhalla"],c:0},
-  {q:"Who is the villain in the first Avengers movie?",a:["Loki","Thanos","Ultron","Ronan"],c:0},
-  {q:"What school does Peter Parker attend?",a:["Midtown High","Xavier's School","Empire High","Brooklyn Tech"],c:0},
-  {q:"What color is the Tesseract/Space Stone?",a:["Blue","Green","Orange","Red"],c:0},
-  {q:"Who trained Doctor Strange in the mystic arts?",a:["The Ancient One","Nick Fury","Odin","Agatha"],c:0},
-  {q:"Which country is Wakanda located in Africa?",a:["East Africa","West Africa","South Africa","North Africa"],c:0},
-  {q:"What is Bruce Banner's alter ego?",a:["The Hulk","The Thing","Goliath","Giant Man"],c:0},
-  {q:"Who played Iron Man in the MCU?",a:["Robert Downey Jr.","Chris Evans","Mark Ruffalo","Chris Hemsworth"],c:0},
-  {q:"What is the name of Thanos's home planet?",a:["Titan","Morag","Xandar","Sakaar"],c:0},
-  {q:"What does SHIELD stand for?",a:["Strategic Homeland Intervention Enforcement Logistics Division","Super Heroes In Every Location Department","Special Heroic Intelligence Elite League Division","Strategic Hero Intelligence Emergency League Deployment"],c:0},
-  {q:"Who is the Sorcerer Supreme of the MCU?",a:["Doctor Strange","The Ancient One","Agatha Harkness","Wong"],c:0},
-  {q:"What is Gamora's adoptive father?",a:["Thanos","Ronan","Ego","Korath"],c:0},
-  {q:"Which stone did Vision hold in his forehead?",a:["Mind Stone","Soul Stone","Time Stone","Reality Stone"],c:0},
-  {q:"Who killed Quicksilver in Avengers: Age of Ultron?",a:["Ultron","Thanos","Iron Man","Vision"],c:0},
-  {q:"What is the name of Black Panther's suit material?",a:["Vibranium","Adamantium","Carbonadium","Uru"],c:0},
-  {q:"Which planet is home to the Nova Corps?",a:["Xandar","Ego","Morag","Knowhere"],c:0},
-  {q:"Who has the power to control ants?",a:["Ant-Man","Beast","Quicksilver","Falcon"],c:0},
-  {q:"What is Loki the god of?",a:["Mischief","Thunder","War","Fire"],c:0},
-  {q:"What is the name of Tony Stark's daughter?",a:["Morgan","Pepper","Wanda","May"],c:0},
-  {q:"Who directed Avengers: Endgame?",a:["Russo Brothers","Joss Whedon","James Gunn","Jon Favreau"],c:0},
-  {q:"What is the name of Nick Fury's eye patch side?",a:["Left eye","Right eye","Both eyes","Neither"],c:0},
-  {q:"Which Avenger uses a bow and arrow?",a:["Hawkeye","Black Widow","Falcon","War Machine"],c:0},
-  {q:"What is T'Challa's superhero name?",a:["Black Panther","Black Knight","Shadow King","Night Crawler"],c:0},
-  {q:"In which year was the first Iron Man movie released?",a:["2008","2007","2010","2005"],c:0},
-  {q:"Who is Scott Lang in the MCU?",a:["Ant-Man","Spider-Man","Captain America","Iron Fist"],c:0},
-  {q:"What does Tony Stark use as his arc reactor fuel initially?",a:["Palladium","Vibranium","Titanium","Uranium"],c:0},
-  {q:"Who is Carol Danvers?",a:["Captain Marvel","Ms. Marvel","Black Widow","Wasp"],c:0},
-  {q:"What is Natasha Romanoff's nickname?",a:["Black Widow","Red Widow","Iron Maiden","Shadow"],c:0},
-  {q:"What world do the Dark Elves come from?",a:["Svartalfheim","Niffleheim","Jotunheim","Muspelheim"],c:0},
-  {q:"Who is Tony Stark's best friend/War Machine?",a:["James Rhodes","Samuel Wilson","Clint Barton","Bucky Barnes"],c:0},
-  {q:"What does Nick Fury lose in Captain Marvel (1990s)?",a:["His eye","His arm","His ear","His leg"],c:0},
-  {q:"Who gave Spider-Man his first Avengers-level mission?",a:["Tony Stark","Nick Fury","Captain America","Thor"],c:0},
-  {q:"What is the name of Thor's sister?",a:["Hela","Sigyn","Sif","Freya"],c:0},
-  {q:"Who created Ultron?",a:["Tony Stark","Bruce Banner","Nick Fury","HYDRA"],c:0},
-  {q:"Which Marvel hero is also known as Earth's Mightiest Hero?",a:["Thor","Hulk","Captain Marvel","Iron Man"],c:0},
-  {q:"What does Steve Rogers become in Avengers: Endgame?",a:["Old man/Gives up shield","King of Asgard","Dies","Goes back to SHIELD"],c:0},
-  {q:"Who is the Vulture in Spider-Man: Homecoming?",a:["Adrian Toomes","Norman Osborn","Otto Octavius","Quentin Beck"],c:0},
-  {q:"What is Wanda Maximoff's superhero name?",a:["Scarlet Witch","Crimson Witch","Red Witch","Scarlet Mage"],c:0},
-  {q:"Which stone can alter reality itself?",a:["Reality Stone","Power Stone","Space Stone","Soul Stone"],c:0},
-  {q:"Where was the Soul Stone hidden?",a:["Vormir","Titan","Morag","Nidavellir"],c:0},
-  {q:"Who is Nebula's sister in the MCU?",a:["Gamora","Mantis","Drax","Star-Lord"],c:0},
-  {q:"What is the name of Hawkeye's family farm?",a:["Barton Farm","Arrow Farm","Clint's Ranch","Hawkeye Ranch"],c:0},
-  {q:"What weapon does Stormbreaker replace for Thor?",a:["Mjolnir","Gungnir","Hofund","Bloodaxe"],c:0},
-  {q:"Who is Shuri's brother in Black Panther?",a:["T'Challa","Killmonger","M'Baku","W'Kabi"],c:0},
-  {q:"What does Groot always say?",a:["I am Groot","I'm Groot","We are Groot","Groot"],c:0},
-  {q:"Who is the Mandarin in Iron Man 3 (twist)?",a:["Trevor Slattery - an actor","A real terrorist","Tony's friend","Nick Fury"],c:0},
-  {q:"What is the name of the quantum realm in Ant-Man?",a:["Quantum Realm","Micro-verse","Sub-atomic Realm","Tiny World"],c:0},
-  {q:"Which stone controls time?",a:["Time Stone","Space Stone","Mind Stone","Power Stone"],c:0},
-  {q:"Who is Sam Wilson?",a:["Falcon/Captain America","War Machine","Iron Fist","Luke Cage"],c:0},
-  {q:"What is the name of Thanos' sword weapon?",a:["Double-edged sword","The Blade","Infinity Blade","Death Sword"],c:0},
-  {q:"Who plays Thor in the MCU?",a:["Chris Hemsworth","Chris Evans","Chris Pratt","Chris Pine"],c:0},
-  {q:"What is the Avengers' base of operations called?",a:["Avengers Compound","Avengers Tower","SHIELD HQ","Stark Tower"],c:0},
-  {q:"Who is Drax the Destroyer?",a:["A warrior seeking revenge on Thanos","A robot","A Kree soldier","An Asgardian"],c:0},
-  {q:"What color is Thanos?",a:["Purple","Blue","Green","Red"],c:0},
-  {q:"Who trained Natasha Romanoff as a spy?",a:["Red Room/KGB","SHIELD","Hydra","CIA"],c:0},
-  {q:"What is Captain America's shield shape?",a:["Round","Oval","Hexagonal","Star-shaped"],c:0},
-  {q:"Which MCU movie introduced the Infinity Stones concept?",a:["Avengers (2012)","Thor (2011)","Iron Man 2 (2010)","Captain America (2011)"],c:0},
-  {q:"What is the name of Peter Quill's ship?",a:["Milano","Enterprise","Nebula","Starlord"],c:0},
-  {q:"Who is Ant-Man's mentor in the first film?",a:["Hank Pym","Tony Stark","Bruce Banner","Nick Fury"],c:0},
-  {q:"Which Avenger can shrink and grow?",a:["Ant-Man","Hulk","Thor","Captain America"],c:0},
-  {q:"What does the M in MCU stand for?",a:["Marvel","Mighty","Mutant","Military"],c:0},
-  {q:"Who is T'Challa's bodyguard general?",a:["Okoye","Shuri","Nakia","Ayo"],c:0},
-  {q:"Where is Kamar-Taj located?",a:["Kathmandu, Nepal","New York, USA","London, UK","Beijing, China"],c:0},
-  {q:"What is the name of Iron Man's home AI system?",a:["Friday","Jarvis","Edith","Karen"],c:0},
-  {q:"What stone did Thanos get last?",a:["Mind Stone from Vision","Soul Stone from Vormir","Time Stone from Strange","Reality Stone"],c:0},
-  {q:"Who plays Black Panther in the MCU?",a:["Chadwick Boseman","Michael B. Jordan","Idris Elba","Anthony Mackie"],c:0},
-  {q:"What is the name of the bridge to Asgard?",a:["Bifrost","Rainbow Road","Yggdrasil Bridge","Asgard Gate"],c:0},
-  {q:"Which hero wears a suit made of nanotechnology?",a:["Iron Man (Infinity War)","Black Panther","War Machine","Spider-Man"],c:0},
-  {q:"Who was the first superhero Nick Fury recruited?",a:["Captain Marvel","Iron Man","Thor","Captain America"],c:0},
-  {q:"What is Yondu's weapon?",a:["Arrow controlled by whistle","Energy whip","Laser gun","Gravity hammer"],c:0},
-  {q:"Who plays Captain America in the MCU?",a:["Chris Evans","Chris Hemsworth","Chris Pratt","Chris Pine"],c:0},
-  {q:"What is Mysterio's real name?",a:["Quentin Beck","Quentin Black","Adrian Toomes","Mac Gargan"],c:0},
-  {q:"What is the secret identity of Thor in his human form?",a:["Donald Blake","John Thor","Eric Masterson","Jake Olson"],c:0},
-  {q:"Who built the first Iron Man suit?",a:["Tony Stark and Ho Yinsen","Tony Stark alone","SHIELD","Howard Stark"],c:0},
-  {q:"What does the Pym Particle do?",a:["Changes size of objects/people","Creates energy blasts","Generates force fields","Allows time travel"],c:0},
-  {q:"Who is the main villain in Thor: Ragnarok?",a:["Hela","Surtur","Loki","Skurge"],c:0},
-  {q:"What country is the Black Panther from?",a:["Wakanda","Zamunda","Nigeria","Kenya"],c:0},
-  {q:"Which Avenger was originally a HYDRA experiment?",a:["Wanda and Pietro Maximoff","Bruce Banner","Captain America","Black Widow"],c:0},
-  {q:"What is the Sanctum Sanctorum?",a:["Doctor Strange's base","Asgard's treasury","SHIELD headquarters","The Avengers compound"],c:0},
-  {q:"Who does Wanda lose in Avengers: Infinity War?",a:["Vision","Quicksilver","Hawkeye","Natasha"],c:0},
-  {q:"What is the real name of the Winter Soldier?",a:["Bucky Barnes","Steve Rogers","Dum Dum Dugan","Gabe Jones"],c:0},
-  {q:"Where was Doctor Strange before becoming a sorcerer?",a:["A neurosurgeon","A physicist","A military general","An astronaut"],c:0},
-  {q:"Who is Star-Lord's father?",a:["Ego the Living Planet","Thanos","Yondu","Ronan"],c:0},
-  {q:"What's the name of Iron Man's first armor?",a:["Mark I","Iron Monger","War Machine","Rescue"],c:0},
-  {q:"Who is the god of thunder in Marvel?",a:["Thor","Zeus","Hercules","Ares"],c:0},
-  {q:"What does Thanos want to do with the Infinity Gauntlet?",a:["Wipe out half of all life","Rule the universe","Become immortal","Destroy Earth"],c:0},
-  {q:"Which Avenger is a former assassin from the Red Room?",a:["Black Widow","Scarlet Witch","Gamora","Valkyrie"],c:0},
-  {q:"Who was the first villain defeated by Spider-Man in the MCU?",a:["Vulture","Shocker","Mysterio","Electro"],c:0},
-  {q:"What is Peter Parker's Spidey sense called officially?",a:["Spider-Sense","Arachnid Sense","Web Sense","Danger Sense"],c:0},
-  {q:"Who kills Yondu in Guardians Vol. 2?",a:["He sacrifices himself for Peter","Ego kills him","Nebula","Rocket"],c:0},
-  {q:"Which stone does Doctor Strange possess?",a:["Time Stone","Space Stone","Mind Stone","Soul Stone"],c:0},
-  {q:"What is the main material in Wakanda that makes it powerful?",a:["Vibranium","Adamantium","Titanite","Neutronium"],c:0},
-  {q:"Who designed the Infinity Gauntlet?",a:["Eitri the Dwarf","Tony Stark","Thanos himself","The Ancient One"],c:0},
-  {q:"What color is the Power Stone?",a:["Purple","Blue","Red","Green"],c:0},
-  {q:"Who is responsible for the Sokovia Accords?",a:["UN governments after Avengers incidents","Tony Stark","Nick Fury","Captain America"],c:0},
-  {q:"What is the name of Thor and Loki's father?",a:["Odin","Bor","Mimir","Tyr"],c:0},
-  {q:"Which stone does the Tesseract contain?",a:["Space Stone","Mind Stone","Reality Stone","Power Stone"],c:0},
-  {q:"Who is Pepper Potts to Tony Stark?",a:["His wife","His secretary then wife","His assistant then fiancee","His girlfriend"],c:0},
-  {q:"What is Falcon's real name?",a:["Sam Wilson","Riley Wilson","Isaiah Bradley","Jim Wilson"],c:0},
-  {q:"Who unleashes the Hulk in Thor: Ragnarok?",a:["Hela","Grandmaster","Loki","Thor"],c:0},
-  {q:"What ship does the Guardians fly in Infinity War?",a:["Benatar","Milano","Sanctuary","Dark Aster"],c:0},
-  {q:"What was Steve Rogers' original health status before the super-soldier serum?",a:["Sickly and frail","Athletic","Average","Slightly underweight"],c:0},
-  {q:"Who is the Red Skull?",a:["Johann Schmidt, HYDRA leader","Ivan Vanko","Zemo","Justin Hammer"],c:0},
+/* ══════════════════════════════════════════
+   QUESTIONS — 1200+
+══════════════════════════════════════════ */
+const MQ=[
+{q:"What metal makes Captain America's shield?",a:["Vibranium","Adamantium","Titanium","Steel"],c:0},
+{q:"Tony Stark's AI butler is named…",a:["JARVIS","HAL","ARIA","NEXUS"],c:0},
+{q:"Thor's hammer is called…",a:["Mjolnir","Gungnir","Stormbreaker","Excalibur"],c:0},
+{q:"Peter Parker's hero name is…",a:["Spider-Man","Iron Boy","Web-Head","Wall-Crawler"],c:0},
+{q:"Thanos wants to erase what fraction of all life?",a:["Half","A quarter","All of it","Two thirds"],c:0},
+{q:"Bruce Banner transforms into…",a:["The Hulk","The Thing","Goliath","Giant-Man"],c:0},
+{q:"Thor's home realm is…",a:["Asgard","Midgard","Jotunheim","Valhalla"],c:0},
+{q:"Which stone controls minds?",a:["Mind Stone","Space Stone","Power Stone","Reality Stone"],c:0},
+{q:"Loki is the god of…",a:["Mischief","Thunder","Fire","War"],c:0},
+{q:"Tony Stark's daughter is named…",a:["Morgan","Pepper","Wanda","May"],c:0},
+{q:"Avengers: Endgame was directed by…",a:["The Russo Brothers","Joss Whedon","James Gunn","Jon Favreau"],c:0},
+{q:"Which Avenger uses a bow and arrow?",a:["Hawkeye","Black Widow","Falcon","Mockingbird"],c:0},
+{q:"Captain America's shield is what shape?",a:["Round","Oval","Hexagonal","Star-shaped"],c:0},
+{q:"Wakanda's super-metal is…",a:["Vibranium","Adamantium","Titanite","Neutronium"],c:0},
+{q:"Who played Iron Man in the MCU?",a:["Robert Downey Jr.","Chris Evans","Mark Ruffalo","Chris Hemsworth"],c:0},
+{q:"The Tesseract contains which stone?",a:["Space Stone","Mind Stone","Reality Stone","Power Stone"],c:0},
+{q:"Thanos's home planet is…",a:["Titan","Morag","Xandar","Sakaar"],c:0},
+{q:"Who is the Sorcerer Supreme?",a:["Doctor Strange","The Ancient One","Agatha Harkness","Wong"],c:0},
+{q:"Vision had which stone in his forehead?",a:["Mind Stone","Soul Stone","Time Stone","Reality Stone"],c:0},
+{q:"Peter Parker attends which school?",a:["Midtown High","Xavier's School","Empire High","Brooklyn Tech"],c:0},
+{q:"The Time Stone lives inside the…",a:["Eye of Agamotto","The Darkhold","Wand of Watoomb","Scepter"],c:0},
+{q:"Gamora's adoptive father is…",a:["Thanos","Ronan","Ego","Korath"],c:0},
+{q:"Ant-Man's real name is…",a:["Scott Lang","Hank Pym","Eric O'Grady","Bill Foster"],c:0},
+{q:"Nova Corps is based on which planet?",a:["Xandar","Ego","Morag","Knowhere"],c:0},
+{q:"Who created Ultron?",a:["Tony Stark","Bruce Banner","Nick Fury","HYDRA"],c:0},
+{q:"Guardians' ship is called the…",a:["Milano","Enterprise","Nebula","Starlord"],c:0},
+{q:"Carol Danvers is better known as…",a:["Captain Marvel","Ms. Marvel","Black Widow","Wasp"],c:0},
+{q:"Natasha Romanoff's codename is…",a:["Black Widow","Red Widow","Iron Maiden","Shadow"],c:0},
+{q:"The Power Stone is what colour?",a:["Purple","Blue","Red","Green"],c:0},
+{q:"War Machine's real name is…",a:["James Rhodes","Samuel Wilson","Clint Barton","Bucky Barnes"],c:0},
+{q:"Thor's sister is named…",a:["Hela","Sigyn","Sif","Freya"],c:0},
+{q:"Vulture's real identity in Homecoming?",a:["Adrian Toomes","Norman Osborn","Otto Octavius","Quentin Beck"],c:0},
+{q:"Wanda Maximoff is known as…",a:["Scarlet Witch","Crimson Witch","Red Witch","Chaos Mage"],c:0},
+{q:"Soul Stone was hidden on…",a:["Vormir","Titan","Morag","Nidavellir"],c:0},
+{q:"Nebula is the sister of…",a:["Gamora","Mantis","Drax's daughter","Moondragon"],c:0},
+{q:"Groot's only line of dialogue is…",a:["I am Groot","We are Groot","I'm Groot","Groot"],c:0},
+{q:"The Winter Soldier is secretly…",a:["Bucky Barnes","Steve Rogers","Dum Dum Dugan","Gabe Jones"],c:0},
+{q:"Star-Lord's father is…",a:["Ego the Living Planet","Thanos","Yondu","Ronan"],c:0},
+{q:"Iron Man's first suit was called…",a:["Mark I","Iron Monger","War Machine","Rescue"],c:0},
+{q:"Pym Particles allow a wearer to…",a:["Change size","Phase through walls","Time travel","Fly"],c:0},
+{q:"Main villain in Thor: Ragnarok?",a:["Hela","Surtur","Loki","Skurge"],c:0},
+{q:"Doctor Strange's base is called…",a:["Sanctum Sanctorum","Avengers Tower","Kamar-Taj","The Vault"],c:0},
+{q:"Who played Captain America?",a:["Chris Evans","Chris Hemsworth","Chris Pratt","Chris Pine"],c:0},
+{q:"Mysterio's real name?",a:["Quentin Beck","Adrian Toomes","Mac Gargan","Norman Osborn"],c:0},
+{q:"Yondu controls his arrow with…",a:["His whistle","His mind","A remote","His hand"],c:0},
+{q:"The Reality Stone is also called…",a:["Aether","Tesseract","Orb","Scepter core"],c:0},
+{q:"Sam Wilson is also known as…",a:["Falcon / Captain America","War Machine","Iron Fist","Luke Cage"],c:0},
+{q:"Who played Thor?",a:["Chris Hemsworth","Chris Evans","Chris Pratt","Liam Hemsworth"],c:0},
+{q:"What colour is Thanos?",a:["Purple","Blue","Grey","Green"],c:0},
+{q:"Natasha was trained by…",a:["The Red Room / KGB","SHIELD","HYDRA","CIA"],c:0},
+{q:"T'Challa's superhero name?",a:["Black Panther","Black Knight","Shadow King","Night Crawler"],c:0},
+{q:"Iron Man was released in…",a:["2008","2007","2010","2005"],c:0},
+{q:"T'Challa's sister is…",a:["Shuri","Okoye","Nakia","Ayo"],c:0},
+{q:"Kamar-Taj is in…",a:["Kathmandu, Nepal","New York","London","Beijing"],c:0},
+{q:"Dark Elves come from…",a:["Svartalfheim","Niffleheim","Jotunheim","Muspelheim"],c:0},
+{q:"The Bifrost connects Asgard via…",a:["Rainbow energy / Einstein-Rosen Bridge","Dark matter","Infinity Stones","Pym Particles"],c:0},
+{q:"Nidavellir is a world of…",a:["Dwarf smiths","Dark Elves","Fire Giants","Frost Giants"],c:0},
+{q:"Ant-Man's mentor is…",a:["Hank Pym","Tony Stark","Bruce Banner","Nick Fury"],c:0},
+{q:"Wanda and Pietro were experiments of…",a:["HYDRA","SHIELD","Stark Industries","AIM"],c:0},
+{q:"Which stone controls space?",a:["Space Stone","Power Stone","Mind Stone","Time Stone"],c:0},
+{q:"The Decimation refers to…",a:["Thanos's snap erasing half of life","The Battle of New York","The fall of SHIELD","Sokovia's destruction"],c:0},
+{q:"Pepper Potts's hero identity is…",a:["Rescue","Iron Maiden","Pepper Armor","Ironette"],c:0},
+{q:"Talos is a shapeshifting…",a:["Skrull","Kree","Chitauri","Asgardian"],c:0},
+{q:"Hulk wore the new gauntlet in Endgame because…",a:["Gamma radiation made it safer for him","He was strongest","Tony designed it for him","Thor refused"],c:0},
+{q:"T'Challa's general / bodyguard is…",a:["Okoye","Shuri","Nakia","Ayo"],c:0},
+{q:"Chitauri are Thanos's alien army in…",a:["Avengers (2012)","Age of Ultron","Infinity War","Endgame"],c:0},
+{q:"Who played Nick Fury?",a:["Samuel L. Jackson","Laurence Fishburne","Idris Elba","Chiwetel Ejiofor"],c:0},
+{q:"Ebony Maw is a member of…",a:["Thanos's Black Order","Kree army","Skrull fleet","Asgardian guard"],c:0},
+{q:"Zemo's full name in Civil War is…",a:["Helmut Zemo","Heinrich Zemo","Herman Zemo","Hans Zemo"],c:0},
+{q:"Black Widow's closest ally is…",a:["Clint Barton / Hawkeye","Steve Rogers","Bruce Banner","Nick Fury"],c:0},
+{q:"M'Baku leads which tribe?",a:["Jabari Tribe","Border Tribe","River Tribe","Mining Tribe"],c:0},
+{q:"Who plays Black Panther?",a:["Chadwick Boseman","Michael B. Jordan","Idris Elba","Anthony Mackie"],c:0},
+{q:"Black Widow sacrificed herself on…",a:["Vormir","Titan","Morag","Nidavellir"],c:0},
+{q:"Spider-Man's best friend in Homecoming is…",a:["Ned Leeds","Flash Thompson","MJ","Harry Osborn"],c:0},
+{q:"Ego is what kind of entity?",a:["Living planet / Celestial","Kree hybrid","Asgardian god","Cosmic parasite"],c:0},
+{q:"Tony Stark's parents were killed by…",a:["The Winter Soldier","Zemo","HYDRA directly","Red Skull"],c:0},
+{q:"Which stone is orange?",a:["Soul Stone","Reality Stone","Time Stone","Space Stone"],c:0},
+{q:"Who snapped in Endgame to bring everyone back?",a:["Hulk","Iron Man","Thor","Captain America"],c:0},
+{q:"Who snapped in Endgame to defeat Thanos?",a:["Iron Man","Hulk","Thor","Captain America"],c:0},
+{q:"Agatha Harkness posed as which character?",a:["Agnes the neighbour","Geraldine","Vision","Dottie"],c:0},
+{q:"Main villain in Ant-Man (2015)?",a:["Darren Cross / Yellowjacket","Ghost","Bill Foster","Justin Hammer"],c:0},
+{q:"TVA stands for…",a:["Time Variance Authority","Temporal Vigilance Agency","Titan Variant Alliance","Time Vortex Authority"],c:0},
+{q:"Mjolnir can be lifted by those who are…",a:["Worthy","Strong enough","Asgardian","Magical"],c:0},
+{q:"Spider-Man: No Way Home features how many Spider-Men?",a:["Three","Two","One","Four"],c:0},
+{q:"Yelena Belova is whose sister?",a:["Natasha Romanoff","Wanda Maximoff","Gamora","Nebula"],c:0},
+{q:"The Eternals have lived on Earth for…",a:["7,000 years","1,000 years","500 years","10,000 years"],c:0},
+{q:"The Celestial in Eternals is called…",a:["Tiamut","Arishem","Eson","Jemiah"],c:0},
+{q:"Wenwu's real identity is…",a:["The true Mandarin","Iron Fist","The Kingpin","Red Skull reborn"],c:0},
+{q:"Moon Knight's main alter ego is…",a:["Marc Spector","Jake Lockley","Steven Grant","Arthur Harrow"],c:0},
+{q:"Khonshu is the Egyptian god of…",a:["The Moon","The Sun","Death","War"],c:0},
+{q:"She-Hulk's real name is…",a:["Jennifer Walters","Jessica Jones","Carol Danvers","Sharon Carter"],c:0},
+{q:"Ms. Marvel's real name is…",a:["Kamala Khan","Nadia Van Dyne","America Chavez","Kate Bishop"],c:0},
+{q:"America Chavez can…",a:["Punch holes through the multiverse","Control time","Generate force fields","Fly at light speed"],c:0},
+{q:"Doctor Strange travels dimensions using a…",a:["Sling Ring","Eye of Agamotto","Mirror Dimension","Cloak of Levitation"],c:0},
+{q:"The Cloak of Levitation…",a:["Acts semi-independently to protect Strange","Makes wearer invisible","Absorbs magic","Grants time travel"],c:0},
+{q:"Loki's biological father is…",a:["Laufey, King of Frost Giants","Odin","Bor","Svartalfr"],c:0},
+{q:"The Dark Dimension is ruled by…",a:["Dormammu","Mephisto","Nightmare","Shuma-Gorath"],c:0},
+{q:"All-Black the Necrosword was wielded by…",a:["Gorr the God Butcher","Carnage","Loki","Thor"],c:0},
+{q:"Gorr appears in which film?",a:["Thor: Love and Thunder","Thor: Ragnarok","Avengers: Endgame","Thor: The Dark World"],c:0},
+{q:"Multiverse of Madness main villain?",a:["Wanda Maximoff / Scarlet Witch","Mordo","Dormammu","Nightmare"],c:0},
+{q:"Kate Bishop's mentor is…",a:["Clint Barton / Hawkeye","Black Widow","Captain America","Nick Fury"],c:0},
+{q:"The Quantum Realm was first explored in…",a:["Ant-Man (2015)","Ant-Man and the Wasp","Avengers: Endgame","Captain Marvel"],c:0},
+{q:"Sam Wilson officially becomes Cap in…",a:["The Falcon and the Winter Soldier","Avengers: Endgame","Captain America 4","Infinity War"],c:0},
+{q:"John Walker became which character?",a:["US Agent","Taskmaster","Battle-Star","The Patriot"],c:0},
+{q:"The Power Broker in FATWS is…",a:["Sharon Carter","Zemo","John Walker","Valentina"],c:0},
+{q:"Hawkeye (Disney+) is set during…",a:["Christmas in New York","Thanksgiving","New Year's Eve","Halloween"],c:0},
+{q:"Nick Fury loses his eye in…",a:["Captain Marvel","Avengers (2012)","Captain America: TWS","Iron Man 2"],c:0},
+{q:"Ronan the Accuser serves which empire?",a:["The Kree","The Skrulls","The Chitauri","The Ravagers"],c:0},
+{q:"Ronan's weapon is…",a:["A stone warhammer","An energy sword","A vibranium spear","A power ring"],c:0},
+{q:"Adam Warlock is created by…",a:["The Sovereign / High Evolutionary","Thanos","The Celestials","HYDRA"],c:0},
+{q:"Rocket Raccoon's best friend is…",a:["Groot","Star-Lord","Drax","Mantis"],c:0},
+{q:"Heimdall is Asgard's…",a:["All-seeing gatekeeper","Thor's brother","A Frost Giant","A Valkyrie"],c:0},
+{q:"Spider-Man's uncle is named…",a:["Ben Parker","Richard Parker","Phil Coulson","Tom May"],c:0},
+{q:"The Green Goblin is secretly…",a:["Norman Osborn","Harry Osborn","Otto Octavius","Quentin Beck"],c:0},
+{q:"Doctor Octopus has how many mechanical arms?",a:["Four","Six","Eight","Two"],c:0},
+{q:"Venom is a…",a:["Symbiote from outer space","Mutant creature","Government experiment","Kree bioweapon"],c:0},
+{q:"The Lizard is Dr…",a:["Curt Connors","Miles Warren","Spencer Smythe","Mac Gargan"],c:0},
+{q:"Miles Morales became Spider-Man when…",a:["He was bitten by a different radioactive spider","Peter Parker died","He injected himself with a formula","He merged with an alternate Peter"],c:0},
+{q:"Wolverine's skeleton is coated in…",a:["Adamantium","Vibranium","Carbonadium","Uru metal"],c:0},
+{q:"Professor X's real name is…",a:["Charles Xavier","Eric Lehnsherr","Hank McCoy","Scott Summers"],c:0},
+{q:"Magneto's real name is…",a:["Eric Lehnsherr","Charles Xavier","Sebastian Shaw","Nathaniel Essex"],c:0},
+{q:"Cyclops's power is…",a:["Concussive optic blasts","Heat vision","Laser eyes that burn","Psychic beams"],c:0},
+{q:"Jean Grey is also known as…",a:["Phoenix / Dark Phoenix","Marvel Girl only","Scarlet Witch","Polaris"],c:0},
+{q:"Storm's real name is…",a:["Ororo Munroe","Cecilia Reyes","Monica Rambeau","Danielle Moonstar"],c:0},
+{q:"Beast's real name is…",a:["Hank McCoy","Bobby Drake","Warren Worthington III","Alex Summers"],c:0},
+{q:"Deadpool's real name is…",a:["Wade Wilson","Logan Howlett","Nathan Summers","Victor Creed"],c:0},
+{q:"Rogue can do what when touching someone?",a:["Absorb their powers and memories","Read their thoughts","Steal their energy","Phase through them"],c:0},
+{q:"Nightcrawler can…",a:["Teleport through a pocket dimension","Phase through walls","Turn invisible","Fly"],c:0},
+{q:"Colossus can transform his body into…",a:["Organic steel","Vibranium","Adamantium","Diamond"],c:0},
+{q:"Mystique can…",a:["Shapeshift into anyone","Become invisible","Read minds","Absorb powers"],c:0},
+{q:"The Silver Surfer serves…",a:["Galactus","Thanos","Kang","The Beyonder"],c:0},
+{q:"Galactus is known as the…",a:["Devourer of Worlds","World Breaker","Cosmic Destroyer","Planet Killer"],c:0},
+{q:"The Fantastic Four's human torch is…",a:["Johnny Storm","Peter Parker","Reed Richards","Ben Grimm"],c:0},
+{q:"The Thing's real name is…",a:["Ben Grimm","Johnny Storm","Reed Richards","Victor Von Doom"],c:0},
+{q:"Mister Fantastic can…",a:["Stretch his body into any shape","Turn invisible","Generate force fields","Fly"],c:0},
+{q:"Doctor Doom rules…",a:["Latveria","Symkaria","Wakanda","Madripoor"],c:0},
+{q:"Cable is whose son?",a:["Cyclops / Scott Summers","Wolverine","Professor X","Magneto"],c:0},
+{q:"Gambit's power involves…",a:["Charging objects with kinetic energy","Telekinesis","Energy projection","Probability manipulation"],c:0},
+{q:"Apocalypse's real name is…",a:["En Sabah Nur","Nathaniel Essex","Sinister","Erik Magnus"],c:0},
+{q:"The Devourer of Worlds is…",a:["Galactus","Thanos","Kang","The Celestials"],c:0},
+{q:"Wakanda is located in…",a:["East Africa","West Africa","North Africa","South Africa"],c:0},
+{q:"What does HYDRA say when you cut off a head?",a:["Cut off one head, two more shall take its place","Hail HYDRA","Power through obedience","The strong survive"],c:0},
+{q:"Stan Lee co-created Spider-Man with…",a:["Steve Ditko","Jack Kirby","John Romita Sr.","Gil Kane"],c:0},
+{q:"Spider-Man first appeared in…",a:["Amazing Fantasy #15","The Amazing Spider-Man #1","Tales of Suspense #39","Journey into Mystery #83"],c:0},
+{q:"Thor first appeared in…",a:["Journey into Mystery #83","The Avengers #1","Tales of Suspense #39","Strange Tales #1"],c:0},
+{q:"Hulk was originally what colour in his first appearance?",a:["Grey","Green","Blue","Yellow"],c:0},
+{q:"Carnage is which symbiote's offspring?",a:["Venom's","Riot's","Anti-Venom's","An entirely separate symbiote"],c:0},
+{q:"The Collector's real name is…",a:["Taneleer Tivan","En Dwi Gast","Eson the Searcher","Cull Obsidian"],c:0},
+{q:"Jessica Jones has the power of…",a:["Super strength and durability","Mind control","Speed","Force fields"],c:0},
+{q:"Wilson Fisk is also known as…",a:["Kingpin","The Owl","Bullseye","The Hood"],c:0},
+{q:"Luke Cage's superpower is…",a:["Unbreakable skin and super strength","Speed","Telekinesis","Energy blasts"],c:0},
+{q:"The Avengers first assembled to fight…",a:["Loki and the Chitauri","Ultron","HYDRA","Thanos"],c:0},
+{q:"Steve Rogers's serum was created by…",a:["Dr. Abraham Erskine","Howard Stark","Bruce Banner","Arnim Zola"],c:0},
+{q:"Red Skull was exiled to…",a:["Vormir","Morag","Titan","Nidavellir"],c:0},
+{q:"First MCU post-credits scene appeared in…",a:["Iron Man (2008)","The Incredible Hulk","Iron Man 2","Thor"],c:0},
+{q:"The first Avengers film was released in…",a:["2012","2011","2013","2010"],c:0},
+{q:"Thaddeus Ross hunts…",a:["The Hulk","Spider-Man","Iron Man","Captain America"],c:0},
+{q:"Vision was created using…",a:["The Mind Stone and Tony's JARVIS","Tony Stark alone","Bruce Banner","SHIELD"],c:0},
+{q:"Daredevil's real name is…",a:["Matt Murdock","Frank Castle","Danny Rand","Luke Cage"],c:0},
+{q:"The Punisher's real name is…",a:["Frank Castle","Matt Murdock","Danny Rand","Wilson Fisk"],c:0},
 ];
 
-const MARVEL_QUESTIONS_HARD = [
-  {q:"What is the name of the cosmic entity that possesses the Power Stone's power in the comics?",a:["The Cosmic Champion","The Power Primordial","The Eternal Flame","Galactus' Core"],c:0},
-  {q:"In the comics, who was the original holder of the Venom symbiote before Eddie Brock?",a:["Spider-Man","Mac Gargan","Angelo Fortunato","Flash Thompson"],c:0},
-  {q:"What is the true name of the Grandmaster in Norse mythology references?",a:["En Dwi Gast","Taneleer Tivan","Eson the Searcher","Cull Obsidian"],c:0},
-  {q:"What is the name of the satellite that Nick Fury uses to watch over Earth?",a:["Insight (Project Insight)","Starwatch","Overwatch","WHIH Orbital"],c:0},
-  {q:"In which comic series did the Infinity Gauntlet storyline originally appear?",a:["The Infinity Gauntlet (1991)","Secret Wars (1984)","Infinity (2013)","Avengers Vol. 3"],c:0},
-  {q:"What is the name of Thanos' Black Order member who has a curved blade?",a:["Corvus Glaive","Proxima Midnight","Cull Obsidian","Ebony Maw"],c:0},
-  {q:"In Doctor Strange, what is the name of the zealot who becomes the villain?",a:["Kaecilius","Dormammu's servant","Mordo's disciple","Agamotto"],c:0},
-  {q:"What chemical compound powered the Iron Man Mk I reactor (exact element)?",a:["Palladium","Prometheum","Rhodium","Lithium"],c:0},
-  {q:"Who is the Celestial that appears in the Infinity War opening sequence?",a:["Eson the Searcher in the Collector's archive","Arishem","Tiamut","Ego"],c:0},
-  {q:"What is the real name of the Ancient One according to Marvel lore?",a:["Her name is never revealed in the MCU","Yao","Sinna","Ancient"],c:0},
-  {q:"In Avengers: Endgame, how many time heist attempts fail before they succeed?",a:["The New York heist fails, requiring the 1970 plan","Only once","Three times","They succeed first try everywhere"],c:0},
-  {q:"What is the name of Ronan's warship in Guardians of the Galaxy?",a:["Dark Aster","Shadow Realm","Kree Hammer","Annihilator"],c:0},
-  {q:"In Age of Ultron, what specific cradle technology was Ultron using to create Vision?",a:["Regeneration Cradle / Helen Cho's cradle","Stark's nanotech","Hydra's biological template","Banner's gamma cell"],c:0},
-  {q:"Which Infinity Stone is found inside the Orb in Guardians of the Galaxy?",a:["Power Stone","Reality Stone","Soul Stone","Space Stone"],c:0},
-  {q:"What specific legal act triggers the Avengers' split in Civil War?",a:["Sokovia Accords (UN Oversight)","Registration Act","Stark Protocols","Vienna Treaty"],c:0},
-  {q:"What is Zemo's full name in Captain America: Civil War?",a:["Helmut Zemo","Heinrich Zemo","Herman Zemo","Hans Zemo"],c:0},
-  {q:"What material are the Dwarves of Nidavellir known for forging?",a:["Uru metal","Vibranium","Adamantium","Asgardian steel"],c:0},
-  {q:"What is the precise date Steve Rogers woke up from the ice in the MCU?",a:["2011, after 70 years","2009, after 68 years","2012, after 70 years","2010, after 69 years"],c:0},
-  {q:"Which arc reactor model did Tony use in The Avengers (2012)?",a:["Mark VI arc reactor","Mark IV","Mk II Chest RT","Triangle reactor"],c:0},
-  {q:"What experiment was Bruce Banner doing when he was exposed to gamma radiation?",a:["He was recreating the super-soldier serum experiment","Gamma bomb test","Project Hulk Trial","Gamma test"],c:0},
-  {q:"Which MCU film is the only one where Stan Lee's cameo was shot last-minute?",a:["Captain Marvel","Endgame","Avengers IW","Thor Ragnarok"],c:0},
-  {q:"What is the name of the zealots' leader who worked with Dormammu?",a:["Kaecilius","Mordo","Pangborn","Tilda"],c:0},
-  {q:"Which stone does Thanos retrieve from Knowhere?",a:["Reality Stone","Space Stone","Power Stone","Soul Stone"],c:0},
-  {q:"What is Nebula's dominant cybernetic eye color?",a:["Blue","Red","Yellow","White"],c:0},
-  {q:"Who forged Stormbreaker for Thor?",a:["Eitri the Dwarf King","Odin","Tony Stark","The Dwarves of Asgard"],c:0},
+const DQ=[
+{q:"Batman's real name is…",a:["Bruce Wayne","Thomas Wayne Jr.","Dick Grayson","Jason Todd"],c:0},
+{q:"Superman's Kryptonian name is…",a:["Kal-El","Jor-El","Zor-El","Kem-El"],c:0},
+{q:"Batman protects which city?",a:["Gotham City","Metropolis","Star City","Central City"],c:0},
+{q:"Superman protects which city?",a:["Metropolis","Gotham City","Star City","Coast City"],c:0},
+{q:"Superman's main weakness is…",a:["Kryptonite","Gold","Silver","Iron"],c:0},
+{q:"Wonder Woman comes from…",a:["Themyscira","Olympia","Amazon Island","Paradise Island"],c:0},
+{q:"Batman's butler is named…",a:["Alfred Pennyworth","Gordon","Lucius Fox","James Wilson"],c:0},
+{q:"The Flash's real name is…",a:["Barry Allen","Wally West","Jay Garrick","Bart Allen"],c:0},
+{q:"Green Lantern Hal Jordan's ring is fuelled by…",a:["Willpower","Fear","Hope","Rage"],c:0},
+{q:"Aquaman rules which kingdom?",a:["Atlantis","Poseidonis","Xebel","Deep Blue"],c:0},
+{q:"DC stands for…",a:["Detective Comics","Dark Comics","Dynamic Comics","Digital Comics"],c:0},
+{q:"Joker's love interest is…",a:["Harley Quinn","Poison Ivy","Catwoman","Talia al Ghul"],c:0},
+{q:"Superman's home planet is…",a:["Krypton","Daxam","Tamaran","New Genesis"],c:0},
+{q:"Lex Luthor is primarily a…",a:["Billionaire industrialist","Scientist only","Doctor","Arms dealer"],c:0},
+{q:"The Batcave is located…",a:["Beneath Wayne Manor","Under Gotham PD","Under Wayne Tower","Below Crime Alley"],c:0},
+{q:"The first Robin is…",a:["Dick Grayson","Jason Todd","Tim Drake","Damian Wayne"],c:0},
+{q:"Clark Kent works at…",a:["The Daily Planet","The Gotham Gazette","WGBS News","The Metropolis Star"],c:0},
+{q:"Harley Quinn's real name is…",a:["Harleen Quinzel","Harley Quinton","Hazel Quinn","Harriet Queen"],c:0},
+{q:"The S on Superman's chest means in Kryptonian…",a:["Hope","Strength","Superman","Kal"],c:0},
+{q:"Nightwing's real name is…",a:["Dick Grayson","Jason Todd","Tim Drake","Wally West"],c:0},
+{q:"Cyborg's real name is…",a:["Victor Stone","Ted Kord","Ray Palmer","Ryan Choi"],c:0},
+{q:"Green Arrow's real name is…",a:["Oliver Queen","Barry Allen","Hal Jordan","Roy Harper"],c:0},
+{q:"Batman: TAS Batman was voiced by…",a:["Kevin Conroy","Michael Keaton","Christian Bale","Ben Affleck"],c:0},
+{q:"The Phantom Zone is a…",a:["Kryptonian prison dimension","Parallel Earth","Dark dimension","Ghost realm"],c:0},
+{q:"Bane is famous for…",a:["Breaking Batman's back","Killing Jason Todd","Bombing Gotham","Defeating Superman"],c:0},
+{q:"Deathstroke's real name is…",a:["Slade Wilson","Wade Wilson","Grant Wilson","Joe Wilson"],c:0},
+{q:"Green Arrow is based in…",a:["Star City","Gotham","Central City","Coast City"],c:0},
+{q:"Catwoman's real name is…",a:["Selina Kyle","Felicia Hardy","Holly Robinson","Eiko Hasigawa"],c:0},
+{q:"The Speed Force powers all…",a:["DC speedsters","The Flash only","All Justice Leaguers","Time travel in DC"],c:0},
+{q:"Darkseid's primary weapon is…",a:["Omega Beams","Boom Tubes","Mother Boxes","The Anti-Life Equation blast"],c:0},
+{q:"New Genesis is home to…",a:["The New Gods","Darkseid","The Amazons","The Guardians"],c:0},
+{q:"Apokolips is ruled by…",a:["Darkseid","Desaad","Granny Goodness","Steppenwolf"],c:0},
+{q:"Shazam's powers come from…",a:["Solomon, Hercules, Atlas, Zeus, Achilles, Mercury","A magic lightning bolt","The speed of Hermes only","A wizard's blessing"],c:0},
+{q:"The first Batgirl is…",a:["Barbara Gordon","Cassandra Cain","Stephanie Brown","Kate Kane"],c:0},
+{q:"Oracle was Barbara Gordon after…",a:["The Joker shot and paralysed her","She retired","She lost her powers","Batman asked her to stop"],c:0},
+{q:"Red Hood is the identity of…",a:["Jason Todd","Dick Grayson","Tim Drake","Damian Wayne"],c:0},
+{q:"Red Robin is…",a:["Tim Drake","Dick Grayson","Damian Wayne","Jason Todd"],c:0},
+{q:"Batman's son by Talia al Ghul is…",a:["Damian Wayne","Terry McGinnis","Ian Wayne","Thomas Wayne Jr."],c:0},
+{q:"Ra's al Ghul uses which pit for immortality?",a:["The Lazarus Pit","The Dionesium Pool","The Fountain of Immortality","The Well of Eternity"],c:0},
+{q:"Talia al Ghul is the daughter of…",a:["Ra's al Ghul","Deathstroke","Lex Luthor","The Joker"],c:0},
+{q:"Scarecrow's real name is…",a:["Jonathan Crane","Jonathan Black","Jack Crane","Dr. Jervis Tetch"],c:0},
+{q:"The Riddler's real name is…",a:["Edward Nygma","Edward Nashton","Nigel Eccles","Neil Rand"],c:0},
+{q:"Two-Face's real name is…",a:["Harvey Dent","Harvey Bullock","Harvey Harris","Harry Dent"],c:0},
+{q:"Mr. Freeze's real name is…",a:["Victor Fries","Arnold Fries","Nora Fries","Doktor Frost"],c:0},
+{q:"Poison Ivy's real name is…",a:["Pamela Isley","Pamela Green","Ivy Pepper","Flora Wayne"],c:0},
+{q:"The Penguin's real name is…",a:["Oswald Cobblepot","Oswald Bullock","Percy Penguin","Charles Osbourne"],c:0},
+{q:"Black Manta is the enemy of…",a:["Aquaman","Batman","Green Lantern","Superman"],c:0},
+{q:"Wonder Woman's mother is…",a:["Hippolyta","Antiope","Menalippe","Penthesilea"],c:0},
+{q:"Wonder Woman's lasso is called…",a:["Lasso of Truth","Golden Lasso","Lasso of Hestia","Truth Rope"],c:0},
+{q:"Superman's Kryptonian father is…",a:["Jor-El","Zor-El","Kel-El","Sul-El"],c:0},
+{q:"Superman's adoptive parents are…",a:["Jonathan and Martha Kent","John and May Kent","Clark and Mary Kent","Norman and Ellen Kent"],c:0},
+{q:"Krypton exploded due to…",a:["Geological instability","A red sun explosion","A Doomsday device","Brainiac's weapon"],c:0},
+{q:"Supergirl's Kryptonian name is…",a:["Kara Zor-El","Kara Jor-El","Zara El","Kala Zor-El"],c:0},
+{q:"Superboy (Conner Kent) is…",a:["A clone of Superman and Lex Luthor","Clark Kent as a teen","Superman's son","A Kryptonian orphan"],c:0},
+{q:"Metallo has a heart of…",a:["Kryptonite","Promethium","Cybernetic steel","Red sun energy"],c:0},
+{q:"Brainiac is…",a:["An alien supercomputer / android","A human cyborg","A Kryptonian AI","A robot from the future"],c:0},
+{q:"Brainiac shrunken and bottled the city of…",a:["Kandor","Metropolis","Star City","Coast City"],c:0},
+{q:"Doomsday is famous for…",a:["Killing Superman","Destroying Metropolis","Breaking Batman's back","Defeating the JLA"],c:0},
+{q:"General Zod's signature phrase is…",a:["Kneel before Zod","Surrender or die","Krypton shall rise again","I am your General"],c:0},
+{q:"John Stewart was originally a…",a:["Marine / architect","Test pilot","Police officer","Astronaut"],c:0},
+{q:"Sinestro uses a ring powered by…",a:["Fear (yellow light)","Willpower (green)","Hope (blue)","Rage (red)"],c:0},
+{q:"The Guardians of the Universe created…",a:["The Green Lantern Corps","The Blue Lanterns","The Manhunters first then GL Corps","The Anti-Monitor"],c:0},
+{q:"Hope rings are which colour?",a:["Blue","Green","Yellow","Violet"],c:0},
+{q:"Red Lanterns are powered by…",a:["Rage","Fear","Hate","Greed"],c:0},
+{q:"Dex-Starr the Red Lantern is a…",a:["Cat","Dog","Fish","Bird"],c:0},
+{q:"Black Lanterns are powered by…",a:["Death (reanimate the dead)","Darkness","Rage","Hatred"],c:0},
+{q:"Martian Manhunter's Martian name is…",a:["J'onn J'onzz","John Jones","Jon Jonzz","J'onn J'nn"],c:0},
+{q:"Martian Manhunter's weakness is…",a:["Fire","Kryptonite","Water","Magic"],c:0},
+{q:"Zatanna casts spells by…",a:["Speaking backwards","Using a wand","Singing","Drawing runes"],c:0},
+{q:"John Constantine is…",a:["An occult detective and magician","A superhero","A Gotham vigilante","An alien mage"],c:0},
+{q:"Swamp Thing was originally…",a:["Alec Holland, a plant elemental","A man merged with a swamp","A botanical experiment","An alien plant creature"],c:0},
+{q:"The Spectre is…",a:["The Spirit of Vengeance / God's wrath","A ghost detective","A time traveller","A divine soldier"],c:0},
+{q:"Booster Gold is from…",a:["The 25th century","Another dimension","An alternate Earth","The distant future of New Gods"],c:0},
+{q:"Blue Beetle (Ted Kord) had…",a:["No powers — just gadgets","A magical scarab","Alien armour","Speed powers"],c:0},
+{q:"Blue Beetle (Jaime Reyes) wears…",a:["An alien Reach scarab","Ted Kord's legacy suit","A Kryptonian device","A STAR Labs invention"],c:0},
+{q:"Black Lightning's power is…",a:["Generate and control electricity","Super strength","Speed","Magnetic control"],c:0},
+{q:"The Source Wall is…",a:["The boundary of the DC universe","A Guardian construct","The edge of Apokolips","A Darkseid barrier"],c:0},
+{q:"Crisis on Infinite Earths merged…",a:["All parallel Earths into one","Only 52 Earths","12 alternate timelines","5 main continuities"],c:0},
+{q:"The Anti-Monitor caused…",a:["The original Crisis on Infinite Earths","Zero Hour","Infinite Crisis","Final Crisis"],c:0},
+{q:"Earth-2 is notable for…",a:["The Golden Age heroes","The Crime Syndicate","An all-female hero world","A world without Superman"],c:0},
+{q:"Ultraman is the Crime Syndicate's evil version of…",a:["Superman","Batman","Wonder Woman","Green Lantern"],c:0},
+{q:"Owlman is the evil version of…",a:["Batman","Superman","Flash","Aquaman"],c:0},
+{q:"Darkseid's true name before godhood is…",a:["Uxas","Izaya","Eradicator","Krant"],c:0},
+{q:"Orion is the son of…",a:["Darkseid","Highfather","Steppenwolf","Metron"],c:0},
+{q:"Mister Miracle's real name is…",a:["Scott Free","Thaddeus Brown","Shilo Norman","Big Barda's husband"],c:0},
+{q:"Steppenwolf is Darkseid's…",a:["Uncle","Brother","Son","General"],c:0},
+{q:"Big Barda was a member of…",a:["The Female Furies then Mister Miracle's team","Only the Furies","Only the Justice League","The New Gods police"],c:0},
+{q:"DC's New 52 relaunch was in…",a:["2011","2006","2016","2004"],c:0},
+{q:"DC Rebirth was in…",a:["2016","2011","2018","2014"],c:0},
+{q:"Watchmen was written by…",a:["Alan Moore","Frank Miller","Geoff Johns","Grant Morrison"],c:0},
+{q:"The Dark Knight Returns was written by…",a:["Frank Miller","Alan Moore","Grant Morrison","Neil Gaiman"],c:0},
+{q:"Barry Allen died in…",a:["Crisis on Infinite Earths (1985)","Zero Hour","The Flash #350","Infinite Crisis"],c:0},
+{q:"Reverse-Flash's real name is…",a:["Eobard Thawne","Hunter Zolomon","Edward Clariss","Rival"],c:0},
+{q:"Captain Cold's weapon creates…",a:["Absolute zero conditions","Ice from moisture","A freeze ray","Cryo-molecular disruption"],c:0},
+{q:"Gorilla Grodd has…",a:["Telepathy and mind control","Super strength only","Speed Force connection","Telekinesis"],c:0},
+{q:"The Flash Museum is in…",a:["Central City","Keystone City","Gotham","Metropolis"],c:0},
+{q:"Solomon Grundy was originally…",a:["Cyrus Gold, a murdered 19th century merchant","A zombie from Swamp Thing","A bog monster","A reanimated gladiator"],c:0},
+{q:"Killer Croc's real name is…",a:["Waylon Jones","Croc Williams","Ray Jones","Killer Jones"],c:0},
+{q:"Man-Bat's real name is…",a:["Kirk Langstrom","Jack Langstrom","Kurt Langstrom","Karl Langstrom"],c:0},
+{q:"Hush is secretly…",a:["Tommy Elliot, Bruce Wayne's childhood friend","Harvey Dent","A cloned Bruce Wayne","Alfred Pennyworth"],c:0},
+{q:"Professor Pyg creates…",a:["Dollotrons (surgically altered mannequins)","Scarecrow-style fear toxin","Explosive traps","Hypnotic gas"],c:0},
+{q:"Damian Wayne was raised by…",a:["The League of Shadows / Talia al Ghul","Batman from birth","Alfred","A Lazarus Pit clone"],c:0},
+{q:"The Court of Owls is…",a:["A secret society controlling Gotham for centuries","An assassin guild","A criminal syndicate","Batman's shadow council"],c:0},
+{q:"Talon is the Court of Owls'…",a:["Reanimated assassin","Spy","Founding member","Enforcer"],c:0},
+{q:"In Flashpoint, Thomas Wayne is…",a:["Batman (Bruce was killed instead)","The Joker","A villain","An anti-hero"],c:0},
+{q:"Flashpoint's Joker is…",a:["Martha Wayne (gone insane from grief)","Thomas Wayne","Joe Chill","A random criminal"],c:0},
+{q:"DC's Trinity is…",a:["Superman, Batman, Wonder Woman","Superman, Batman, Green Lantern","Batman, Flash, Wonder Woman","Superman, Flash, Aquaman"],c:0},
+{q:"The Justice Society of America was the first…",a:["Superhero team in comics (1940s)","DC team in the 70s","Golden Age Flash's team","WWII government squad"],c:0},
+{q:"Alan Scott is the…",a:["Golden Age Green Lantern (magical ring)","Original Silver Age GL","First DC superhero","Founder of the JSA"],c:0},
+{q:"Power Girl is…",a:["Kara Zor-L, the Earth-2 Supergirl","Clark Kent's cousin on Earth-1","A clone of Supergirl","An alternate-world Wonder Woman"],c:0},
+{q:"Black Canary's power is…",a:["The Canary Cry (sonic scream)","Martial arts only","Telepathy","Super strength"],c:0},
+{q:"Green Arrow and Black Canary are…",a:["Romantic partners","Best friends","Rivals","Mentor and student"],c:0},
+{q:"Speedy / Arsenal's real name is…",a:["Roy Harper","Connor Hawke","Mia Dearden","Will Harper"],c:0},
+{q:"Prometheus (DC) has a helmet with…",a:["Accumulated skills of the world's greatest fighters","A neural-link to machines","Alien battle data","Batman's own tactics"],c:0},
+{q:"Vandal Savage is immortal because…",a:["He was struck by a radioactive meteor in prehistory","He uses the Lazarus Pit","He made a deal with Neron","He drank from the Fountain of Immortality"],c:0},
+{q:"Raven's father is…",a:["Trigon","Darkseid","The Anti-Monitor","Brother Blood"],c:0},
+{q:"Raven's power set includes…",a:["Empathy, dark sorcery, soul-self projection","Telepathy only","Flight and super strength","Time manipulation"],c:0},
+{q:"Starfire's real name is…",a:["Koriand'r","Kom'and'r","Rivan'dr","Princess X of Tamaran"],c:0},
+{q:"Starfire fires…",a:["Starbolts (ultraviolet energy blasts)","Laser beams","Fire blasts","Plasma bolts"],c:0},
+{q:"Beast Boy's real name is…",a:["Garfield Logan","Gar Drake","Mark Logan","Gary Logan"],c:0},
+{q:"Terra was a Teen Titan secretly working for…",a:["Deathstroke","A Tamaran agent","A future villain","A shape-shifter"],c:0},
+{q:"The original Teen Titans were…",a:["Robin, Kid Flash, Aqualad, Wonder Girl, Speedy","Robin, Superboy, Wonder Girl, Kid Flash","Nightwing, Cyborg, Starfire, Raven, Beast Boy","Batman's suggestion only"],c:0},
+{q:"Young Justice animated features…",a:["Robin, Kid Flash, Aqualad, Superboy, Miss Martian, Artemis","The original Teen Titans","The Justice League juniors","Batman's students only"],c:0},
+{q:"Miss Martian is the niece of…",a:["Martian Manhunter","Green Lantern","The Atom","Doctor Fate"],c:0},
+{q:"Static's power is…",a:["Electromagnetism (flies on a steel disc)","Lightning only","Magnetism only","Speed Force connection"],c:0},
+{q:"Steel's real name is…",a:["John Henry Irons","Steel John Henry","Henry Johns","Iron John Steel"],c:0},
+{q:"Doctor Fate wears a golden helmet containing…",a:["The essence of the Lord of Order Nabu","Ancient Egyptian magic","Kryptonian AI","Atlantean sorcery"],c:0},
+{q:"Nth metal allows Hawkman to…",a:["Fly and defeat magic","Phase through walls","Absorb Speed Force","Nullify kryptonite"],c:0},
+{q:"Wildcat is a JSA member who is…",a:["A former boxer who trained many heroes","A speedster","A GL trainee","A mystic"],c:0},
+{q:"Mister Terrific's trademark is…",a:["T-spheres and 'Fair Play' across his costume","A cowl with no mask","A checkerboard costume","A hammer and shield"],c:0},
+{q:"Stargirl uses…",a:["The Cosmic Staff and Cosmic Converter Belt","A power ring","A vibranium shield","Nth metal armour"],c:0},
+{q:"Bane's strength comes from…",a:["Venom drug pumped through his tubes","Steroids","Super soldier serum","Mirakuru"],c:0},
+{q:"Deathstroke is known as…",a:["The Terminator","The Hunter","The Assassin","The Mercenary"],c:0},
+{q:"Commissioner Gordon's daughter is…",a:["Barbara Gordon","Sarah Essen","Renee Gordon","Jessica Gordon"],c:0},
+{q:"Batwoman (Kate Kane) is…",a:["A lesbian Jewish heiress trained as a soldier","Barbara Gordon's cousin","Bruce Wayne's sister","A GCPD detective"],c:0},
+{q:"Kyle Rayner was given the last GL ring by…",a:["Ganthet, a Guardian","Abin Sur","Hal Jordan","Sinestro"],c:0},
+{q:"Abin Sur's ring chose Hal Jordan because…",a:["Hal was nearest and showed no fear","Hal was the most worthy human","Abin chose him intentionally","Ganthet directed it to Hal"],c:0},
+{q:"Hal Jordan became Parallax because…",a:["He was possessed by the fear entity Parallax after Coast City was destroyed","He went mad from grief","He was corrupted by Sinestro","He used a yellow ring"],c:0},
+{q:"The White Lantern Corps' power is…",a:["Life","All emotions combined","Hope","Pure light"],c:0},
+{q:"Star Sapphires channel the power of…",a:["Love (violet)","Hope","Compassion","Willpower"],c:0},
+{q:"Doomsday Clock revealed…",a:["Doctor Manhattan caused the New 52 changes","The Joker's real identity","The Multiverse's true origin","Superman's birth date"],c:0},
+{q:"Doctor Fate's tower is…",a:["Kent Nelson's extra-dimensional home","A Gotham skyscraper","An Atlantean structure","An alien construct"],c:0},
+{q:"Plastic Man can…",a:["Stretch and reshape his body into any form","Generate force fields","Shapeshift into other people","Become invisible"],c:0},
+{q:"Guy Gardner is a Green Lantern known for…",a:["Arrogance and a bowl haircut","Cowardice","Incredible skill","Being an alien"],c:0},
+{q:"The Court of Owls' assassin is called…",a:["Talon","Owl","Claw","Raptor"],c:0},
+{q:"Aquaman's trident allows him to…",a:["Command sea life and control water","Fly","Time travel","Generate energy blasts"],c:0},
+{q:"Lois Lane works at…",a:["The Daily Planet","Gotham Gazette","WGBS","The Metropolis Star"],c:0},
+{q:"Who played Wonder Woman in the DCEU?",a:["Gal Gadot","Margot Robbie","Amy Adams","Emilia Clarke"],c:0},
+{q:"Who played The Joker in The Dark Knight?",a:["Heath Ledger","Jack Nicholson","Joaquin Phoenix","Jared Leto"],c:0},
+{q:"Who played Batman in the 1989 film?",a:["Michael Keaton","Val Kilmer","George Clooney","Adam West"],c:0},
+{q:"Superman's fortress is called…",a:["Fortress of Solitude","Arctic Base","Kryptonian Palace","Hall of Elders"],c:0},
+{q:"Main villain in The Dark Knight?",a:["The Joker","Bane","Ra's al Ghul","Two-Face"],c:0},
+{q:"The Batmobile in the Nolan trilogy is called…",a:["The Tumbler","Batmobile Mark II","Black Bat","Dark Knight"],c:0},
+{q:"Who created Batman?",a:["Bob Kane and Bill Finger","Jerry Siegel","William Marston","Gardner Fox"],c:0},
+{q:"Who created Superman?",a:["Jerry Siegel and Joe Shuster","Bob Kane","William Marston","Gardner Fox"],c:0},
+{q:"Who created Wonder Woman?",a:["William Moulton Marston","Bob Kane","Jerry Siegel","Gardner Fox"],c:0},
+{q:"The Suicide Squad is officially called…",a:["Task Force X","The Expendables","Black Ops Unit Delta","ARGUS Team Omega"],c:0},
+{q:"Amanda Waller runs…",a:["The Suicide Squad / Task Force X","Checkmate","ARGUS","SHIELD equivalent"],c:0},
+{q:"Rick Flag leads…",a:["The Suicide Squad's field team","Checkmate","ARGUS","The Outsiders"],c:0},
+{q:"Sandman (Gaiman) rules…",a:["The Dreaming (realm of dreams)","The Phantom Zone","Death's domain","The Dark Dimension"],c:0},
+{q:"Death in the Sandman universe is…",a:["A cheerful young woman with an ankh","A skeleton in a robe","A grim reaper","An old man with a scythe"],c:0},
+{q:"Lex Luthor becomes US President in…",a:["The comics (2000 DC story)","The animated series","The DCEU","Super Friends"],c:0},
+{q:"Injustice: Gods Among Us features a Superman who…",a:["Becomes a tyrant after Joker kills Lois Lane","Joins the Crime Syndicate","Is controlled by Darkseid","Becomes Doomsday"],c:0},
+{q:"The Anti-Life Equation can…",a:["Remove the will and free thought of all sentient beings","Destroy the universe","Kill all gods","Power a weapon against Darkseid"],c:0},
+{q:"Granny Goodness runs…",a:["Terror orphanages on Apokolips","Darkseid's army","The Female Furies","All of the above"],c:0},
+{q:"Deadman is…",a:["A ghost who can possess living bodies","A zombie hero","A time traveller","An undead assassin"],c:0},
+{q:"Elongated Man is…",a:["Ralph Dibny, a detective who can stretch his body","A clone of Plastic Man","A Martian shapeshifter","A metahuman runner"],c:0},
+{q:"Animal Man can…",a:["Borrow the powers of any animal","Shapeshift into animals","Communicate with animals","Control animals telepathathically"],c:0},
+{q:"Black Lightning's power is…",a:["Generate and control electricity","Super strength","Speed","Magnetic control"],c:0},
+{q:"Cyborg's father is…",a:["Silas Stone","Thomas Morrow","T.O. Morrow","Marcus Stone"],c:0},
+{q:"The Hall of Justice was the original base in…",a:["Super Friends (animated series)","The comics primarily","Both equally","Justice League International"],c:0},
+{q:"The Watchtower is located…",a:["On the Moon","In orbit only","Under the ocean","In the Batcave"],c:0},
+{q:"Justice League International was known for…",a:["Light-hearted humour and international membership","Dark stories","Only classic members","Military oversight"],c:0},
+{q:"Booster Gold and Blue Beetle were known in JLI for…",a:["Being comedy relief best friends","Being the most powerful","Being rivals","Leading the team"],c:0},
+{q:"Identity Crisis involved the murder of…",a:["Sue Dibny (Elongated Man's wife)","Lois Lane","Oracle","Zatanna"],c:0},
+{q:"Zero Hour was caused by…",a:["Hal Jordan as Parallax trying to recreate time","The Anti-Monitor","Batman's retirement","Reverse-Flash"],c:0},
+{q:"The Speed Force lets the Flash…",a:["Move at incredible speeds and perform time travel","Time travel only","Move at light speed only","Control time"],c:0},
+{q:"Atrocitus formed the…",a:["Red Lantern Corps","Black Lantern Corps","Orange Lanterns","Sinestro Corps"],c:0},
+{q:"The Reach created…",a:["The Blue Beetle scarabs","The Sinestro Corps","The Black Lanterns","The Star Sapphires"],c:0},
+{q:"Maxwell Lord killed…",a:["Ted Kord / Blue Beetle II","Booster Gold","Captain Atom","Ralph Dibny"],c:0},
+{q:"The Question's real identity is…",a:["Vic Sage (later Renee Montoya)","Ted Kord","Ray Palmer","Steve Trevor"],c:0},
+{q:"Doctor Mid-Nite is a hero who is…",a:["A blind doctor who sees only in darkness","A sonic hero","A mystic healer","A gravity controller"],c:0},
+{q:"Hourman's power from Miraclo lasts…",a:["One hour per pill","One hour per day","Unlimited time","Thirty minutes"],c:0},
+{q:"The Doom Patrol are…",a:["Unlikely heroes with strange, debilitating powers","Street-level vigilantes","Alien protectors","Underground mutants"],c:0},
+{q:"Robotman's human brain is in a…",a:["Robot body after his was destroyed in an accident","Clone body","Cybernetic suit","Energy construct"],c:0},
+{q:"The Elasti-Girl can…",a:["Grow and shrink to any size","Stretch her body","Become elastic like rubber","Change her density"],c:0},
+{q:"Brother Blood is an enemy of…",a:["The Teen Titans","The Justice League","Batman","Green Lantern"],c:0},
+{q:"The Legion of Super-Heroes is set in the…",a:["30th/31st century","Far future","An alternate timeline","The 25th century"],c:0},
+{q:"Mon-El is weakened by…",a:["Lead (instead of kryptonite)","Iron","Gold kryptonite","Red sunlight only"],c:0},
+{q:"Bouncing Boy's power is…",a:["Inflate into a bouncing sphere","Super strength","Elasticity","Speed"],c:0},
+{q:"The Sandman by Neil Gaiman is set in…",a:["The Dreaming and the real world","Only the Dreaming","An alternate DC Earth","Future DC"],c:0},
+{q:"Lucifer in the Sandman universe…",a:["Abandons Hell and gives Morpheus the key","Rules Hell eagerly","Fights Dream","Serves the Presence"],c:0},
+{q:"The Question (Renee Montoya) took over from…",a:["Vic Sage","Ted Kord","Ray Palmer","Ralph Dibny"],c:0},
+{q:"Duke Thomas operates as…",a:["The Signal (daytime Batman ally)","Batman Beyond","Nightwing's partner","Red Hood's partner"],c:0},
+{q:"Stephanie Brown served as…",a:["Spoiler, Robin briefly, then Batgirl","Only Spoiler","Only Batgirl","Robin and Batgirl"],c:0},
 ];
 
-const DC_QUESTIONS_NORMAL = [
-  {q:"What is Batman's real name?",a:["Bruce Wayne","Thomas Wayne","Dick Grayson","Jason Todd"],c:0},
-  {q:"What is Superman's Kryptonian name?",a:["Kal-El","Jor-El","Zor-El","Kem-El"],c:0},
-  {q:"Who is the Flash's arch-nemesis?",a:["Reverse-Flash","Zoom","Captain Cold","Mirror Master"],c:0},
-  {q:"What is Wonder Woman's home island called?",a:["Themyscira","Olympia","Amazon Island","Paradise Island"],c:0},
-  {q:"What weakness does Superman have?",a:["Kryptonite","Gold","Magic only","Silver"],c:0},
-  {q:"Who is the CEO of Wayne Enterprises?",a:["Bruce Wayne","Lucius Fox","Alfred Pennyworth","James Gordon"],c:0},
-  {q:"What is Green Lantern's power source?",a:["A power ring fueled by willpower","The sun","A mystical gem","Cosmic energy"],c:0},
-  {q:"Who is the Joker's love interest?",a:["Harley Quinn","Poison Ivy","Catwoman","Talia al Ghul"],c:0},
-  {q:"What planet is Superman from?",a:["Krypton","Daxam","Tamaran","New Genesis"],c:0},
-  {q:"Who trained Batman as a child/young adult?",a:["Ra's al Ghul / League of Shadows","Alfred","Thomas Wayne","Henri Ducard"],c:0},
-  {q:"What is Aquaman's kingdom called?",a:["Atlantis","Poseidonis","Neptune's Court","Deep Blue"],c:0},
-  {q:"Who is Clark Kent's love interest?",a:["Lois Lane","Lana Lang","Wonder Woman","Supergirl"],c:0},
-  {q:"What city does Batman protect?",a:["Gotham City","Metropolis","Star City","Central City"],c:0},
-  {q:"What city does Superman protect?",a:["Metropolis","Gotham City","Star City","Coast City"],c:0},
-  {q:"What is Cyborg's real name?",a:["Victor Stone","Ted Kord","Ray Palmer","Ryan Choi"],c:0},
-  {q:"Who is Green Arrow?",a:["Oliver Queen","Barry Allen","Hal Jordan","Roy Harper"],c:0},
-  {q:"What is The Flash's real name (Barry Allen's job)?",a:["CSI forensic scientist","Reporter","Lawyer","Doctor"],c:0},
-  {q:"Who is Batman's butler?",a:["Alfred Pennyworth","Gordon","Robin","Lucius"],c:0},
-  {q:"What does DC stand for?",a:["Detective Comics","Dark Comics","Dynamic Comics","Digital Comics"],c:0},
-  {q:"Who is Lex Luthor?",a:["Superman's arch-nemesis, billionaire","Batman's villain","A hero","The Flash's enemy"],c:0},
-  {q:"What is the name of Batman's cave base?",a:["The Batcave","Wayne Cave","Dark Lair","Knight's Den"],c:0},
-  {q:"Who is the first Robin?",a:["Dick Grayson","Jason Todd","Tim Drake","Damian Wayne"],c:0},
-  {q:"What color is Aquaman's classic costume?",a:["Orange and green","Blue and gold","Red and gold","Green and blue"],c:0},
-  {q:"Who is Wonder Woman's mother?",a:["Hippolyta","Antiope","Menalippe","Diana"],c:0},
-  {q:"What is the Suicide Squad?",a:["Government-run team of supervillains","A group of vigilantes","A military unit","A SHIELD equivalent"],c:0},
-  {q:"Who plays Wonder Woman in the DCEU?",a:["Gal Gadot","Margot Robbie","Amy Adams","Emilia Clarke"],c:0},
-  {q:"What is the name of the newspaper Clark Kent works at?",a:["Daily Planet","Gotham Gazette","Star City Times","Central City Post"],c:0},
-  {q:"Who is Shazam?",a:["Billy Batson with powers of ancient gods","A magician","A New God","A Green Lantern"],c:0},
-  {q:"What is Darkseid's ultimate weapon/power?",a:["Omega Beams","Anti-Life Equation Beams","Boom Tubes","Desaad"],c:0},
-  {q:"Where does Green Lantern get his power ring?",a:["The Guardians of Oa","He creates it","It's inherited","Found on a crashed ship"],c:0},
-  {q:"Who played The Joker in The Dark Knight?",a:["Heath Ledger","Jack Nicholson","Joaquin Phoenix","Jared Leto"],c:0},
-  {q:"What is the name of Harley Quinn's real identity?",a:["Harleen Quinzel","Harley Quinton","Hazel Quinn","Harriet Queen"],c:0},
-  {q:"What does the 'S' on Superman's chest stand for in Kryptonian?",a:["Hope","Strength","Superman","Kal"],c:0},
-  {q:"Who is the main villain in Batman v Superman?",a:["Lex Luthor (and Doomsday)","General Zod","Darkseid","The Joker"],c:0},
-  {q:"Who is Deathstroke?",a:["Slade Wilson, mercenary","A villain who fights Flash","A Gotham crime lord","A villain from Krypton"],c:0},
-  {q:"What is the Batmobile?",a:["Batman's armored car","A stealth jet","A submarine","A motorcycle"],c:0},
-  {q:"Who is the Black Manta?",a:["Aquaman's arch-nemesis","Batman's villain","A Flash villain","A Superman enemy"],c:0},
-  {q:"What is Nightwing's real name?",a:["Dick Grayson","Jason Todd","Tim Drake","Wally West"],c:0},
-  {q:"Who is Catwoman?",a:["Selina Kyle, thief/antihero","A Gotham city villain","A mercenary","A vigilante"],c:0},
-  {q:"What is the Anti-Life Equation?",a:["Darkseid's weapon to control all will","A formula to destroy universes","A mathematical paradox","Superman's weakness"],c:0},
-  {q:"Who voiced Batman in Batman: The Animated Series?",a:["Kevin Conroy","Michael Keaton","Christian Bale","Ben Affleck"],c:0},
-  {q:"Who is the Green Lantern (Hal Jordan)?",a:["Test pilot from Coast City","A Marine","A police officer","An astronaut"],c:0},
-  {q:"What is the Phantom Zone?",a:["Kryptonian prison dimension","The Batcave's deeper section","Darkseid's domain","A pocket universe"],c:0},
-  {q:"Who is the villain Bane known for?",a:["Breaking Batman's back","Killing Robin","Blowing up Gotham","Defeating Superman"],c:0},
-  {q:"What is the name of Barry Allen's wife in the comics?",a:["Iris West","Linda Park","Patty Spivot","Jesse Quick"],c:0},
-  {q:"Who created the DC Universe character Superman?",a:["Jerry Siegel and Joe Shuster","Bob Kane","William Marston","Gardner Fox"],c:0},
-  {q:"What is Starfire's home planet?",a:["Tamaran","Krypton","Thanagar","Daxam"],c:0},
-  {q:"Who is Raven in the Teen Titans?",a:["Daughter of Trigon with soul powers","An Amazon","A Kryptonian","A Green Lantern"],c:0},
-  {q:"Who is the main villain in Aquaman (2018)?",a:["Orm (Ocean Master)","Black Manta","Steppenwolf","Darkseid"],c:0},
-  {q:"What is the Lazarus Pit?",a:["Pool that resurrects the dead used by Ra's al Ghul","A weapon","A Kryptonian artifact","A portal"],c:0},
-  {q:"Who is Poison Ivy?",a:["Pamela Isley, botanist with plant powers","A Gotham crime boss","An alien","A mercenary"],c:0},
-  {q:"Which Robin becomes Red Hood?",a:["Jason Todd","Dick Grayson","Tim Drake","Damian Wayne"],c:0},
-  {q:"What is the real name of the villain Scarecrow?",a:["Jonathan Crane","Jonathan Black","Jack Crane","Jonathan Fear"],c:0},
-  {q:"Who is Hawkman?",a:["Carter Hall / Prince Khufu reincarnated","Hal Jordan alternate","A bird-themed villain","An Atlantean warrior"],c:0},
-  {q:"Who is Oracle in the DC universe?",a:["Barbara Gordon after being paralyzed","A computer AI","A superhero alias","A villain"],c:0},
-  {q:"What is the Green Lantern Corps?",a:["An intergalactic police force","A superhero team on Earth","A military organization","A religious order"],c:0},
-  {q:"What does Aquaman's trident allow him to do?",a:["Control water and sea life","Fly","Time travel","Create energy blasts"],c:0},
-  {q:"Who played Batman in the 1989 film?",a:["Michael Keaton","Val Kilmer","George Clooney","Adam West"],c:0},
-  {q:"What is the name of Superman's fortress?",a:["Fortress of Solitude","Arctic Base","Kryptonian Palace","Hall of Elders"],c:0},
-  {q:"Who is the main villain in The Dark Knight?",a:["The Joker","Bane","Ra's al Ghul","Two-Face"],c:0},
-  {q:"What is Martian Manhunter's real name?",a:["J'onn J'onzz","John Jones","Jon Stewart","J'ona J'nn"],c:0},
-  {q:"Who is the villain Two-Face?",a:["Harvey Dent, former DA","A lawyer turned criminal","A Joker associate","A mercenary"],c:0},
-  {q:"What is the name of Wonder Woman's weapon?",a:["Lasso of Truth","Golden Lasso","Lasso of Hestia","Truth Rope"],c:0},
-  {q:"Which DC hero is known as the World's Greatest Detective?",a:["Batman","The Question","Nightwing","Robin"],c:0},
-  {q:"What is the Speed Force?",a:["The energy source that gives speedsters their power","A weapon","A dimension","A planet"],c:0},
-  {q:"Who is Superboy?",a:["Conner Kent / Kon-El, Superman's clone","Clark Kent as a teenager","Superman's son","A Kryptonian"],c:0},
-  {q:"Who is Amanda Waller?",a:["Government official who runs the Suicide Squad","A villain","A SHIELD equivalent director","A Gotham figure"],c:0},
-  {q:"What is the name of the rock that weakens Superman?",a:["Kryptonite","Cryptonite","Doomsday Rock","Anti-matter"],c:0},
-  {q:"Who is the main villain in Justice League (2017)?",a:["Steppenwolf","Darkseid","Lex Luthor","Brainiac"],c:0},
-  {q:"What is Green Arrow's base city?",a:["Star City","Gotham","Central City","Coast City"],c:0},
-  {q:"Who is Zatanna?",a:["A magician superhero, John Constantine's ally","An Amazon","A Kryptonian","A Green Lantern"],c:0},
-  {q:"What is the Watchtower?",a:["The Justice League's space station","A Gotham lighthouse","Batman's backup base","A Kryptonian structure"],c:0},
-  {q:"Who is Beast Boy?",a:["Gar Logan, can transform into animals","A monster-themed hero","A villain","An alien shapeshifter"],c:0},
-  {q:"Which color Kryptonite makes Superman evil?",a:["Red","Green","Gold","Blue"],c:0},
-  {q:"Who is Brainiac?",a:["An alien supercomputer, Superman villain","A human scientist","A clone","A robot"],c:0},
-  {q:"What is the name of the Batmobile in the Christopher Nolan trilogy?",a:["The Tumbler","Batmobile Mark II","Black Bat","Dark Knight"],c:0},
-  {q:"What color is the Green Lantern ring?",a:["Green","Blue","Yellow","White"],c:0},
-  {q:"Who is the villain Reverse-Flash?",a:["Eobard Thawne from the future","A Flash villain from the past","A speedster clone","Hunter Zolomon"],c:0},
-  {q:"What is the Hall of Justice?",a:["The Justice League's original base","A courthouse","A museum","A government building"],c:0},
-  {q:"Who created Batman?",a:["Bob Kane and Bill Finger","Jerry Siegel","William Marston","Gardner Fox"],c:0},
-  {q:"What is Superman's biological father's name?",a:["Jor-El","Zor-El","Kem-El","Jon-El"],c:0},
-  {q:"Who are the New Gods?",a:["Cosmic beings from New Genesis and Apokolips","Ancient Greek deities","Kryptonian gods","Alien creatures"],c:0},
-  {q:"What is Apokolips?",a:["Darkseid's dark planet","A dimension","An alternate Earth","A space prison"],c:0},
-  {q:"What does the Omega Beams do?",a:["Hunt and disintegrate targets no matter what","Create force fields","Teleport enemies","Drain power"],c:0},
-  {q:"Who is Captain Boomerang?",a:["George Harkness, Flash villain and Suicide Squad member","A Batman villain","An Arrow villain","A Superman enemy"],c:0},
-  {q:"What is Gotham City's police commissioner's name?",a:["James Gordon","Harvey Bullock","Renee Montoya","Maggie Sawyer"],c:0},
-  {q:"Who is the villain Mr. Freeze?",a:["Victor Fries, scientist who needs subzero temperatures","A cold-based alien","A sorcerer","A mercenary"],c:0},
-  {q:"What is the Joker's appearance defined by?",a:["White face, green hair, red lips","Purple suit only","Clown makeup only","A scar"],c:0},
-  {q:"Who played Aquaman in the DCEU?",a:["Jason Momoa","Dwayne Johnson","Idris Elba","Common"],c:0},
-  {q:"What is the name of Batman's Batplane?",a:["Batwing","Batjet","Dark Wing","Night Flyer"],c:0},
-  {q:"What is Supergirl's Kryptonian name?",a:["Kara Zor-El","Kala Zor-El","Zar El","Kara El"],c:0},
-  {q:"Who is the villain Sinestro?",a:["Former Green Lantern who now uses fear (yellow ring)","A Superman enemy","A Batman villain","A Darkseid agent"],c:0},
-  {q:"What is the Daily Planet's famous logo feature?",a:["A spinning globe on top","An eagle","A satellite","A printing press"],c:0},
-  {q:"Who is the Riddler?",a:["Edward Nygma, leaves riddle clues","A Joker copycat","A tech villain","A smuggler"],c:0},
-  {q:"What is the Mother Box in DC?",a:["A New God technology that can open Boom Tubes","A weapon","A communication device","A power source for humans"],c:0},
-];
+/* ══════════════════════════════════════════
+   GAME STATE
+══════════════════════════════════════════ */
+const BNAMES=['ThanosBot','LokiBot','ZodBot','UltronBot','BaneBot','VenomBot','RiddlerBot','CarnageBot','DoomBot','ApocBot'];
+const BCOLS=['#FF5555','#1E90FF','#A855F7','#F59E0B','#10B981','#EF4444','#3B82F6','#8B5CF6','#EC4899','#14B8A6'];
 
-const DC_QUESTIONS_HARD = [
-  {q:"What is the exact name of the prison dimension where General Zod was imprisoned?",a:["The Phantom Zone","The Mirror Dimension","The Void","The Omega Realm"],c:0},
-  {q:"Who was the original Black Canary before Dinah Lance?",a:["Dinah Drake Lance (Dinah's mother)","Barbara Gordon","Jade","Lady Blackhawk"],c:0},
-  {q:"What is the real name of the villain Parallax (the entity)?",a:["The entity of Fear (yellow impurity in the GL battery)","Thaal Sinestro","Hank Hall","Kyle Rayner"],c:0},
-  {q:"In which issue does Batman break his back at the hands of Bane?",a:["Batman #497 (Knightfall)","Batman #500","Detective Comics #660","Batman #450"],c:0},
-  {q:"What is the true name of Darkseid before he became a New God?",a:["Uxas","Avia's son","Steppenwolf's nephew","Heggra's heir"],c:0},
-  {q:"What specific biochemical compound does Bane use in his tubes?",a:["Venom","Titan","Mirakuru","Doomsday serum"],c:0},
-  {q:"In the original Crisis on Infinite Earths, how many parallel Earths were merged into one?",a:["Infinite earths merged into one","52 earths","12 universes","5 main Earths"],c:0},
-  {q:"Which specific issue of Detective Comics first introduced Batman?",a:["Detective Comics #27 (1939)","Detective Comics #1","Batman #1","Action Comics #27"],c:0},
-  {q:"What is the name of the force opposing the Speed Force in DC comics?",a:["The Still Force / Negative Speed Force","Anti-Speed Force","Reverse Force","Dark Speed"],c:0},
-  {q:"What is the atomic number of Kryptonite as classified in DC science?",a:["It's classified as element 126 (Kryptonite)","Element 79","Element 666","Unknown"],c:0},
-  {q:"What is the Source Wall in DC cosmology?",a:["The boundary of the universe containing imprisoned beings","A planet","A weapon","A dimension"],c:0},
-  {q:"Who created the Anti-Monitor?",a:["He evolved from a primordial being on Qward","The Guardians","Krona","Nekron"],c:0},
-  {q:"What is the name of Batman's son by Talia al Ghul?",a:["Damian Wayne","Terry McGinnis","Ian Wayne","Thomas Wayne Jr."],c:0},
-  {q:"What is the White Lantern Corps power emotion?",a:["Life","Hope","Love","Compassion"],c:0},
-  {q:"In the New 52, who rewrote history to become the Flash?",a:["Professor Zoom/Reverse-Flash (Flashpoint)","Hunter Zolomon","Savitar","Black Flash"],c:0},
-  {q:"What is the name of the cosmic being who created both New Genesis and Apokolips?",a:["Perpetua (or the Source)","The Presence","Monitor","Anti-Monitor"],c:0},
-  {q:"Which Gotham landmark does Ra's al Ghul target in Batman Begins?",a:["The monorail/train system to spread toxin","Wayne Tower","Gotham Bridge","Arkham Asylum"],c:0},
-  {q:"What is Vandal Savage's origin?",a:["Prehistoric human struck by a meteorite, became immortal","A New God","A wizard","An alien"],c:0},
-  {q:"Who is the Spectre?",a:["The Spirit of Vengeance/God's wrath","A ghost hero","A dimension jumper","A time traveler"],c:0},
-  {q:"What is the true identity of the villain Prometheus (DC)?",a:["Son of criminals killed by police who trained against heroes","A god","A time traveler","A clone"],c:0},
-  {q:"In the Justice League animated series, what is the exact founding membership count?",a:["7 original members","6","5","8"],c:0},
-  {q:"What is the name of Lex Luthor's kryptonite-powered suit?",a:["Lexosuit / Warsuit","Kryptonite Armor","LexCorp Battle Suit","The Green Machine"],c:0},
-  {q:"What is the real name of the Phantom Stranger?",a:["Judas Iscariot (one theory)","Hal Jordan","Boston Brand","Thomas Elliot"],c:0},
-  {q:"Who is the original Batwoman in DC comics?",a:["Kathy Kane","Barbara Gordon","Kate Kane","Renee Montoya"],c:0},
-  {q:"What planet are the Guardians of the Universe from?",a:["Oa","Maltus","Qward","Zamaron"],c:0},
-];
-
-// Build full question pools
-function buildPool(mode) {
-  let normal = [];
-  let hard = [];
-  if (mode === 'marvel') {
-    normal = shuffle([...MARVEL_QUESTIONS_NORMAL]);
-    hard = shuffle([...MARVEL_QUESTIONS_HARD]);
-  } else if (mode === 'dc') {
-    normal = shuffle([...DC_QUESTIONS_NORMAL]);
-    hard = shuffle([...DC_QUESTIONS_HARD]);
-  } else {
-    normal = shuffle([...MARVEL_QUESTIONS_NORMAL, ...DC_QUESTIONS_NORMAL]);
-    hard = shuffle([...MARVEL_QUESTIONS_HARD, ...DC_QUESTIONS_HARD]);
-  }
-  return [...normal.slice(0, 20), ...hard.slice(0, 5)];
-}
-
-function shuffle(arr) {
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [arr[i], arr[j]] = [arr[j], arr[i]];
-  }
-  return arr;
-}
-
-// ======================== GAME STATE ========================
-let state = {
-  mode: null, playerName: '', botCount: 1, level: 'normal',
-  questions: [], currentQ: 0, players: [],
-  timerInterval: null, timeLeft: 20, answered: false,
-  botTimers: []
+let G={
+  mode:null,     // 'marvel' | 'dc' | 'mixed'
+  lvl:'normal',
+  pname:'',
+  bots:1,
+  qs:[],         // 25 questions for this round
+  qi:0,          // current question index
+  players:[],
+  timer:null,
+  tLeft:20,
+  answered:false,
+  bTimers:[]
 };
 
-const BOT_NAMES = ['IronBot','VenomBot','ThanosBot','LokiBot','ZodBot','OzymandBot','BaneBot','DoomsdayBot','UltronBot','CarnageBot'];
-const BOT_COLORS = ['#e23636','#0476d0','#a855f7','#f59e0b','#10b981','#ef4444','#3b82f6','#8b5cf6','#ec4899','#14b8a6'];
+/* Bot behaviour */
+function bfSec(l){return l==='easy'?17:l==='normal'?13:l==='medium'?10:7}
+function bfAcc(l){return l==='easy'?.40:l==='normal'?.58:l==='medium'?.74:.88}
 
-function getBotAnswerSec(level) {
-  if (level === 'easy') return 18;
-  if (level === 'normal') return 14;
-  if (level === 'medium') return 11;
-  return 8;
+/* ══════════════════════════════════════════
+   NAVIGATION
+══════════════════════════════════════════ */
+function goTo(id){
+  document.querySelectorAll('.scr').forEach(s=>{s.classList.remove('on')});
+  const s=document.getElementById(id);
+  s.classList.add('on');
+  // scroll to top
+  window.scrollTo(0,0);
+}
+function closeIG(){
+  const b=document.getElementById('ig-bar');
+  b.style.transition='opacity .3s, transform .3s';
+  b.style.opacity='0';b.style.transform='translateX(-50%) translateY(-20px)';
+  setTimeout(()=>b.style.display='none',320);
+}
+function cSoon(){
+  const b=document.getElementById('ig-bar');
+  b.querySelector('.ig-tx').textContent='🚧 Coming soon — follow for updates!';
+  b.style.display='flex';b.style.opacity='1';b.style.transform='translateX(-50%)';
 }
 
-function getBotAccuracy(level) {
-  if (level === 'easy') return 0.45;
-  if (level === 'normal') return 0.60;
-  if (level === 'medium') return 0.75;
-  return 0.88;
-}
-
-// ======================== UI HELPERS ========================
-function goTo(screenId) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active', 'entering'));
-  const screen = document.getElementById(screenId);
-  screen.classList.add('active', 'entering');
-  window.scrollTo(0, 0);
-}
-
-function closePopup() {
-  const popup = document.getElementById('support-popup');
-  popup.style.animation = 'fadeIn 0.3s ease reverse forwards';
-  setTimeout(() => popup.style.display = 'none', 300);
-}
-
-function showComingSoon() {
-  const popup = document.getElementById('support-popup');
-  popup.querySelector('.popup-logo').textContent = '🚧 Coming Soon!';
-  popup.querySelector('.popup-sub').textContent = 'Multiplayer is in development';
-  popup.querySelector('.popup-support').textContent = 'Follow for updates:';
-  popup.querySelector('.popup-platform-label').textContent = '📸 Instagram';
-  popup.querySelector('.popup-handle').innerHTML = '<span class="popup-insta-icon">📸</span>@mp4.ae_';
-  popup.querySelector('.popup-skip').textContent = 'Got it!';
-  popup.style.display = 'flex';
-  popup.style.animation = 'fadeIn 0.3s ease';
-}
-
-function selectMode(mode) {
-  state.mode = mode;
-  document.getElementById('setup-title').textContent =
-    mode === 'marvel' ? '🔴 Marvel Setup' :
-    mode === 'dc' ? '🔵 DC Setup' : '⚡ Mixed Setup';
+/* ══════════════════════════════════════════
+   STEP 1: Pick Universe (from mode-select)
+══════════════════════════════════════════ */
+function pickUniverse(m){
+  G.mode=m;
+  // Update setup screen title & tag
+  const titles={marvel:'🔴 MARVEL QUIZ SETUP',dc:'🔵 DC QUIZ SETUP',mixed:'⚡ MIXED QUIZ SETUP'};
+  const tags={marvel:'MARVEL ONLY',dc:'DC ONLY',mixed:'MARVEL + DC MIXED'};
+  const tagCls={marvel:'tag-mv',dc:'tag-dc',mixed:'tag-mx'};
+  document.getElementById('setup-title').textContent=titles[m];
+  const tagEl=document.getElementById('setup-tag');
+  tagEl.textContent=tags[m];
+  tagEl.className='setup-mode-tag '+tagCls[m];
   goTo('setup');
 }
 
-let botCount = 1;
-function changeBotCount(d) {
-  botCount = Math.max(1, Math.min(5, botCount + d));
-  document.getElementById('bot-count-display').textContent = botCount;
+/* ══════════════════════════════════════════
+   STEP 2: Setup controls
+══════════════════════════════════════════ */
+let _bots=1,_lvl='normal';
+function adjBot(d){
+  _bots=Math.max(1,Math.min(5,_bots+d));
+  document.getElementById('bot-val').textContent=_bots;
+}
+function pickLvl(l){
+  _lvl=l;
+  document.querySelectorAll('.lb').forEach(b=>b.classList.remove('on'));
+  document.querySelector('.lb.'+l).classList.add('on');
 }
 
-let selectedLevel = 'normal';
-function selectLevel(lvl) {
-  selectedLevel = lvl;
-  document.querySelectorAll('.level-btn').forEach(b => b.classList.remove('selected'));
-  document.querySelector(`.level-btn.${lvl}`).classList.add('selected');
+/* ══════════════════════════════════════════
+   STEP 3: Build question pool
+══════════════════════════════════════════ */
+function buildPool(mode){
+  let pool;
+  if(mode==='marvel') pool=[...MQ];
+  else if(mode==='dc') pool=[...DQ];
+  else pool=[...MQ,...DQ];
+  return sfl(pool).slice(0,25);
+}
+function sfl(a){
+  const b=[...a];
+  for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]]}
+  return b;
 }
 
-function startQuiz() {
-  const name = document.getElementById('player-name').value.trim() || 'Hero';
-  state.playerName = name;
-  state.botCount = botCount;
-  state.level = selectedLevel;
-  state.questions = buildPool(state.mode);
-  state.currentQ = 0;
-  state.answered = false;
-
-  state.players = [{ name, score: 0, correct: 0, isBot: false, color: '#ffd700', answered: false }];
-  for (let i = 0; i < state.botCount; i++) {
-    state.players.push({
-      name: BOT_NAMES[i % BOT_NAMES.length],
-      score: 0, correct: 0, isBot: true,
-      color: BOT_COLORS[i % BOT_COLORS.length],
-      answered: false
-    });
+/* ══════════════════════════════════════════
+   STEP 4: Start game
+══════════════════════════════════════════ */
+function startGame(){
+  const name=(document.getElementById('pname').value.trim()||'Hero').slice(0,18);
+  G.pname=name;G.bots=_bots;G.lvl=_lvl;
+  G.qs=buildPool(G.mode);G.qi=0;G.answered=false;
+  G.players=[{name,score:0,correct:0,isBot:false,color:'#FFD600',ans:false,thinking:false}];
+  for(let i=0;i<G.bots;i++){
+    G.players.push({name:BNAMES[i%10],score:0,correct:0,isBot:true,color:BCOLS[i%10],ans:false,thinking:false});
   }
-
   goTo('quiz');
   renderPlayers();
-  loadQuestion();
+  loadQ();
 }
 
-// ======================== QUESTION LOGIC ========================
-function loadQuestion() {
-  const q = state.questions[state.currentQ];
-  const isHard = state.currentQ >= 20;
-  state.answered = false;
-  state.players.forEach(p => { p.answered = false; p.thinkingStatus = false; });
+/* ══════════════════════════════════════════
+   LOAD QUESTION
+══════════════════════════════════════════ */
+function loadQ(){
+  const q=G.qs[G.qi];
+  G.answered=false;
+  G.players.forEach(p=>{p.ans=false;p.thinking=false});
 
-  const prog = ((state.currentQ + 1) / 25 * 100).toFixed(0);
-  document.getElementById('progress-fill').style.width = prog + '%';
-  document.getElementById('q-progress-text').textContent = `Q ${state.currentQ + 1} / 25`;
-  document.getElementById('q-type-label').textContent = isHard ? 'HARD' : 'NORMAL';
-  document.getElementById('header-score').textContent = state.players[0].score;
+  // Header
+  const pct=((G.qi+1)/25*100).toFixed(1);
+  document.getElementById('qb-fill').style.width=pct+'%';
+  document.getElementById('qb-num').textContent='Q'+(G.qi+1)+'/25';
+  document.getElementById('qb-lbl').textContent='1 POINT';
+  document.getElementById('qb-sc').textContent=G.players[0].score;
 
-  const badge = document.getElementById('q-type-badge');
-  badge.className = 'q-type-badge ' + (isHard ? 'q-type-hard' : 'q-type-normal');
-  badge.textContent = isHard ? '🔥 Hard Question (+30 pts)' : '⭐ Normal Question (+20 pts)';
+  // Question meta
+  document.getElementById('qno').textContent='QUESTION '+(G.qi+1)+' OF 25';
+  document.getElementById('qtxt').textContent=q.q;
 
-  document.getElementById('q-number').textContent = `QUESTION ${state.currentQ + 1} OF 25`;
-  document.getElementById('q-text').textContent = q.q;
+  // Shuffle answers, keep track of correct index
+  const ans=q.a.map((t,i)=>({t,i}));
+  for(let i=ans.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[ans[i],ans[j]]=[ans[j],ans[i]]}
 
-  const shuffled = shuffleAnswers(q);
-  const grid = document.getElementById('answers-grid');
-  grid.innerHTML = '';
-  const letters = ['A', 'B', 'C', 'D'];
-  shuffled.forEach((ans, i) => {
-    const btn = document.createElement('button');
-    btn.className = 'ans-btn';
-    btn.innerHTML = `<span class="ans-letter">${letters[i]}</span>${ans.text}`;
-    btn.dataset.idx = ans.origIdx;
-    btn.onclick = () => playerAnswer(parseInt(btn.dataset.idx), q.c, btn, isHard);
+  const grid=document.getElementById('agrid');
+  grid.innerHTML='';
+  const L=['A','B','C','D'];
+  ans.forEach((a,idx)=>{
+    const btn=document.createElement('button');
+    btn.className='abtn';
+    btn.dataset.orig=a.i;
+    btn.innerHTML=`<span class="altr">${L[idx]}</span><span>${a.t}</span>`;
+    btn.onclick=()=>playerAns(parseInt(btn.dataset.orig),q.c);
     grid.appendChild(btn);
   });
 
-  startTimer(isHard);
-  scheduleBots(q, isHard);
+  startTimer();
+  schedBots(q);
   renderPlayers();
 }
 
-function shuffleAnswers(q) {
-  const answers = q.a.map((text, i) => ({ text, origIdx: i }));
-  for (let i = answers.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [answers[i], answers[j]] = [answers[j], answers[i]];
-  }
-  return answers;
-}
-
-function playerAnswer(chosen, correct, btn, isHard) {
-  if (state.answered) return;
-  state.answered = true;
-  clearInterval(state.timerInterval);
-  state.botTimers.forEach(t => clearTimeout(t));
-
-  revealAnswers(chosen, correct);
-  const pts = isHard ? 30 : 20;
-  const timeBonus = Math.floor(state.timeLeft / 2);
-  if (chosen === correct) {
-    state.players[0].score += pts + timeBonus;
-    state.players[0].correct++;
-    showFeedback('✅ CORRECT! +' + (pts + timeBonus), '#4ade80');
+/* ══════════════════════════════════════════
+   PLAYER ANSWERS
+══════════════════════════════════════════ */
+function playerAns(chosen,correct){
+  if(G.answered)return;
+  G.answered=true;
+  clearInterval(G.timer);
+  G.bTimers.forEach(t=>clearTimeout(t));
+  revealAll(chosen,correct);
+  if(chosen===correct){
+    G.players[0].score++;
+    G.players[0].correct++;
+    showToast('✅ CORRECT! +1','#00E676');
   } else {
-    showFeedback('❌ WRONG!', '#f87171');
+    showToast('❌ WRONG!','#FF4444');
   }
-  state.players[0].answered = true;
+  G.players[0].ans=true;
   renderPlayers();
-  setTimeout(nextQuestion, 2200);
+  setTimeout(nextQ,2000);
 }
 
-function revealAnswers(chosen, correct) {
-  document.querySelectorAll('.ans-btn').forEach(btn => {
-    btn.classList.add('revealed');
-    const idx = parseInt(btn.dataset.idx);
-    if (idx === correct) btn.classList.add('correct');
-    else if (idx === chosen && chosen !== correct) btn.classList.add('wrong');
+function revealAll(chosen,correct){
+  document.querySelectorAll('.abtn').forEach(b=>{
+    b.classList.add('done');
+    const i=parseInt(b.dataset.orig);
+    if(i===correct) b.classList.add('correct');
+    else if(i===chosen&&chosen!==correct) b.classList.add('wrong');
   });
 }
 
-function scheduleBots(q, isHard) {
-  state.botTimers = [];
-  const answerSec = getBotAnswerSec(state.level);
-  const accuracy = getBotAccuracy(state.level);
-
-  state.players.slice(1).forEach((bot) => {
-    const jitter = Math.random() * 2000;
-    const delay = Math.max(0, (20 - answerSec) * 1000) + jitter;
-
-    const statusTimer = setTimeout(() => {
-      if (!state.answered) {
-        bot.thinkingStatus = true;
+/* ══════════════════════════════════════════
+   BOT LOGIC
+══════════════════════════════════════════ */
+function schedBots(q){
+  G.bTimers=[];
+  const sec=bfSec(G.lvl);
+  const acc=bfAcc(G.lvl);
+  G.players.slice(1).forEach(bot=>{
+    const delay=Math.max(300,(20-sec)*1000+Math.random()*1800);
+    // Show thinking dots a bit before answering
+    const t1=setTimeout(()=>{
+      if(!G.answered){bot.thinking=true;renderPlayers()}
+    },Math.max(0,delay-1300));
+    // Bot answers
+    const t2=setTimeout(()=>{
+      if(!G.answered){
+        bot.ans=true;bot.thinking=false;
+        if(Math.random()<acc){bot.score++;bot.correct++}
         renderPlayers();
       }
-    }, delay - 1500 > 0 ? delay - 1500 : 0);
-    state.botTimers.push(statusTimer);
-
-    const t = setTimeout(() => {
-      if (!state.answered) {
-        bot.answered = true;
-        bot.thinkingStatus = false;
-        const correct = Math.random() < accuracy;
-        if (correct) {
-          bot.score += (isHard ? 30 : 20);
-          bot.correct++;
-        }
-        renderPlayers();
-      }
-    }, delay);
-    state.botTimers.push(t);
+    },delay);
+    G.bTimers.push(t1,t2);
   });
 }
 
-function startTimer(isHard) {
-  state.timeLeft = 20;
-  updateTimerUI(20);
-
-  clearInterval(state.timerInterval);
-  state.timerInterval = setInterval(() => {
-    state.timeLeft--;
-    updateTimerUI(state.timeLeft);
-    if (state.timeLeft <= 0) {
-      clearInterval(state.timerInterval);
-      if (!state.answered) {
-        state.answered = true;
-        state.botTimers.forEach(t => clearTimeout(t));
-        revealAnswers(-1, state.questions[state.currentQ].c);
-        showFeedback('⏰ TIME UP!', '#f59e0b');
-        state.players.slice(1).forEach(bot => {
-          if (!bot.answered) {
-            bot.answered = true;
-            if (Math.random() < getBotAccuracy(state.level)) {
-              bot.score += isHard ? 30 : 20;
-              bot.correct++;
-            }
-          }
+/* ══════════════════════════════════════════
+   TIMER
+══════════════════════════════════════════ */
+function startTimer(){
+  G.tLeft=20;updTimer(20);
+  clearInterval(G.timer);
+  G.timer=setInterval(()=>{
+    G.tLeft--;
+    updTimer(G.tLeft);
+    if(G.tLeft<=0){
+      clearInterval(G.timer);
+      if(!G.answered){
+        G.answered=true;
+        G.bTimers.forEach(t=>clearTimeout(t));
+        revealAll(-1,G.qs[G.qi].c);
+        showToast('⏰ TIME UP!','#FFD600');
+        // Remaining bots answer
+        G.players.slice(1).forEach(b=>{
+          if(!b.ans){b.ans=true;if(Math.random()<bfAcc(G.lvl)){b.score++;b.correct++}}
         });
         renderPlayers();
-        setTimeout(nextQuestion, 2200);
+        setTimeout(nextQ,2000);
       }
     }
-  }, 1000);
+  },1000);
 }
 
-function updateTimerUI(t) {
-  document.getElementById('timer-num').textContent = t;
-  const arc = document.getElementById('timer-arc');
-  const circumference = 220;
-  const offset = circumference * (1 - t / 20);
-  arc.style.strokeDashoffset = offset;
-
-  const color = t > 10 ? 'var(--gold)' :
-                t > 5 ? '#fb923c' : '#f87171';
-  arc.style.stroke = color;
-  document.getElementById('timer-num').style.color = color;
+function updTimer(t){
+  document.getElementById('tnum').textContent=t;
+  const arc=document.getElementById('tarc');
+  const r=33,circ=2*Math.PI*r;
+  arc.style.strokeDasharray=circ.toFixed(2);
+  arc.style.strokeDashoffset=(circ*(1-t/20)).toFixed(2);
+  const col=t>10?'#FFD600':t>5?'#fb923c':'#f87171';
+  arc.style.stroke=col;
+  document.getElementById('tnum').style.color=col;
 }
 
-function showFeedback(text, color) {
-  const el = document.getElementById('result-feedback');
-  el.textContent = text;
-  el.style.color = color;
-  el.classList.remove('show');
-  void el.offsetWidth;
-  el.classList.add('show');
-  setTimeout(() => el.classList.remove('show'), 1500);
+/* ══════════════════════════════════════════
+   NEXT QUESTION / END
+══════════════════════════════════════════ */
+function nextQ(){
+  G.qi++;
+  if(G.qi>=25) endGame();
+  else loadQ();
 }
 
-function nextQuestion() {
-  state.currentQ++;
-  if (state.currentQ >= 25) {
-    endQuiz();
-  } else {
-    loadQuestion();
-  }
-}
-
-// ======================== PLAYERS RENDER ========================
-function renderPlayers() {
+/* ══════════════════════════════════════════
+   RENDER PLAYERS
+══════════════════════════════════════════ */
+function renderPlayers(){
   // Desktop sidebar
-  const list = document.getElementById('players-list');
-  list.innerHTML = '';
-  state.players.forEach(p => {
-    const div = document.createElement('div');
-    div.className = 'player-card' + (p.answered ? ' answered' : '');
-    const initial = p.name[0].toUpperCase();
-    const statusHTML = p.isBot && p.thinkingStatus && !p.answered ?
-      `<div class="bot-thinking"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>` :
-      p.answered ? `<span style="color:#4ade80;font-size:0.72rem;">✓ Answered</span>` :
-      `<span>${p.isBot ? '🤖 Waiting...' : '⌛ Your turn'}</span>`;
-
-    div.innerHTML = `
-      <div class="player-row">
-        <div class="player-avatar" style="background:${p.color}22;color:${p.color};border:1px solid ${p.color}44;">${initial}</div>
-        <div class="player-info">
-          <div class="player-name">${p.name}${p.isBot ? ' 🤖' : ' 👤'}</div>
-          <div class="player-score">${p.score} pts</div>
-        </div>
+  const sl=document.getElementById('splayers');
+  sl.innerHTML='';
+  G.players.forEach(p=>{
+    const d=document.createElement('div');
+    d.className='pc'+(p.ans?' pa':'');
+    const stat=p.isBot&&p.thinking&&!p.ans
+      ?`<div class="tkg"><div class="dk"></div><div class="dk"></div><div class="dk"></div></div>`
+      :p.ans
+        ?`<span style="color:#4ade80;font-size:.7rem">✓ Answered</span>`
+        :`<span>${p.isBot?'🤖 waiting…':'⌛ your turn'}</span>`;
+    d.innerHTML=`<div class="pr">
+      <div class="pav" style="background:${p.color}22;color:${p.color};border:1px solid ${p.color}44">${p.name[0]}</div>
+      <div style="flex:1;min-width:0">
+        <div class="pnm">${p.name}${p.isBot?' 🤖':' 👤'}</div>
+        <div class="ppt">${p.score} pt${p.score!==1?'s':''}</div>
       </div>
-      <div class="player-status">${statusHTML}</div>
-    `;
-    list.appendChild(div);
+    </div><div class="pst">${stat}</div>`;
+    sl.appendChild(d);
   });
 
-  // Mobile bar
-  const bar = document.getElementById('mobile-players-bar');
-  bar.innerHTML = '';
-  state.players.forEach(p => {
-    const chip = document.createElement('div');
-    chip.className = 'mobile-player-chip' + (p.answered ? ' answered' : '');
-    chip.innerHTML = `
-      <div class="chip-avatar" style="background:${p.color}22;color:${p.color};border:1px solid ${p.color}44;">${p.name[0]}</div>
-      <span>${p.name.length > 8 ? p.name.slice(0,7)+'…' : p.name}</span>
-      <span class="chip-score">${p.score}</span>
-      ${p.answered ? '<span style="color:#4ade80;font-size:0.7rem;">✓</span>' : ''}
-    `;
-    bar.appendChild(chip);
+  // Mobile chips
+  const ml=document.getElementById('mchips');
+  ml.innerHTML='';
+  G.players.forEach(p=>{
+    const c=document.createElement('div');
+    c.className='mch'+(p.ans?' pa':'');
+    c.innerHTML=`<div class="mchav" style="background:${p.color}33;color:${p.color}">${p.name[0]}</div>
+      <div><div class="mchnm">${p.name}</div><div class="mchpt">${p.score}pt</div></div>`;
+    ml.appendChild(c);
   });
 }
 
-// ======================== END QUIZ ========================
-function endQuiz() {
-  clearInterval(state.timerInterval);
-  const sorted = [...state.players].sort((a, b) => b.score - a.score);
-  const winner = sorted[0];
+/* ══════════════════════════════════════════
+   TOAST
+══════════════════════════════════════════ */
+function showToast(msg,col){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.style.color=col;
+  t.classList.remove('on');void t.offsetWidth;t.classList.add('on');
+  setTimeout(()=>t.classList.remove('on'),1600);
+}
 
-  document.getElementById('results-winner').textContent =
-    winner.name === state.playerName ?
-    `🎉 You win with ${winner.score} points!` :
-    `${winner.name} wins with ${winner.score} points!`;
+/* ══════════════════════════════════════════
+   END GAME & RESULTS
+══════════════════════════════════════════ */
+function endGame(){
+  clearInterval(G.timer);
+  const sorted=[...G.players].sort((a,b)=>b.score-a.score);
+  const win=sorted[0];
+  document.getElementById('rwn').textContent=
+    win.name===G.pname
+      ?`🎉 YOU WIN with ${win.score} point${win.score!==1?'s':''}!`
+      :`${win.name} wins with ${win.score} points!`;
 
-  const table = document.getElementById('results-table');
-  const medals = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣', '6️⃣'];
-  table.innerHTML = `
-    <div class="rt-row header">
-      <div class="rt-rank">#</div>
-      <div class="rt-name" style="color:var(--muted);font-size:0.72rem;letter-spacing:1px;">PLAYER</div>
-      <div class="rt-score" style="color:var(--muted);font-size:0.72rem;">SCORE</div>
-      <div class="rt-correct" style="color:var(--muted);font-size:0.72rem;">CORRECT</div>
+  const med=['🥇','🥈','🥉','4️⃣','5️⃣','6️⃣'];
+  document.getElementById('rtbl').innerHTML=`
+    <div class="rth">
+      <span>#</span><span>Player</span><span>Score</span><span>Correct</span>
     </div>
-    ${sorted.map((p, i) => `
-      <div class="rt-row">
-        <div class="rt-rank"><span class="rank-medal">${medals[i] || (i+1)}</span></div>
-        <div class="rt-name">${p.name}${p.isBot ? ' 🤖' : ' 👤'}</div>
-        <div class="rt-score">${p.score}</div>
-        <div class="rt-correct">${p.correct}/25</div>
-      </div>
-    `).join('')}
-  `;
+    ${sorted.map((p,i)=>`
+    <div class="rtr">
+      <span class="rrk">${med[i]||i+1}</span>
+      <span class="rnm">${p.name}${p.isBot?' 🤖':' 👤'}</span>
+      <span class="rsc">${p.score}</span>
+      <span class="rcr">${p.correct}/25</span>
+    </div>`).join('')}`;
 
   goTo('results');
-  if (winner.name === state.playerName) launchConfetti();
+  if(win.name===G.pname) confetti();
 }
 
-function launchConfetti() {
-  const colors = ['#ffd700','#e23636','#0476d0','#4ade80','#fb923c','#a855f7','#f87171'];
-  for (let i = 0; i < 80; i++) {
-    const el = document.createElement('div');
-    el.className = 'confetti-piece';
-    el.style.cssText = `
-      left: ${Math.random() * 100}vw;
-      background: ${colors[Math.floor(Math.random() * colors.length)]};
-      border-radius: ${Math.random() > 0.5 ? '50%' : '2px'};
-      --dur: ${2 + Math.random() * 2}s;
-      --delay: ${Math.random() * 2}s;
-      --drift: ${(Math.random() - 0.5) * 200}px;
-    `;
+function playAgain(){
+  G.qi=0;
+  G.qs=buildPool(G.mode);
+  G.players.forEach(p=>{p.score=0;p.correct=0;p.ans=false;p.thinking=false});
+  goTo('quiz');
+  renderPlayers();
+  loadQ();
+}
+
+/* ══════════════════════════════════════════
+   CONFETTI
+══════════════════════════════════════════ */
+function confetti(){
+  const cols=['#FFD600','#FF3030','#1488FC','#00E676','#FB923C','#A855F7','#F87171'];
+  for(let i=0;i<90;i++){
+    const el=document.createElement('div');el.className='cf';
+    el.style.cssText=`left:${Math.random()*100}vw;top:0;background:${cols[Math.floor(Math.random()*cols.length)]};--br:${Math.random()>.5?'50%':'3px'};--d:${2.5+Math.random()*2}s;--dl:${Math.random()*1.4}s;--dx:${(Math.random()-.5)*220}px`;
     document.body.appendChild(el);
-    setTimeout(() => el.remove(), 5000);
+    setTimeout(()=>el.remove(),5000);
   }
 }
 
-function playAgain() {
-  state.currentQ = 0;
-  state.questions = buildPool(state.mode);
-  state.players.forEach(p => { p.score = 0; p.correct = 0; p.answered = false; p.thinkingStatus = false; });
-  goTo('quiz');
-  renderPlayers();
-  loadQuestion();
-}
-
-// ======================== STARS ========================
-(function createStars() {
-  const sf = document.getElementById('starfield');
-  for (let i = 0; i < 120; i++) {
-    const s = document.createElement('div');
-    s.className = 'star';
-    const size = Math.random() * 2.5;
-    s.style.cssText = `
-      left:${Math.random()*100}%;top:${Math.random()*100}%;
-      width:${size}px;height:${size}px;
-      --d:${2+Math.random()*4}s;
-      animation-delay:${Math.random()*4}s;
-    `;
-    sf.appendChild(s);
+/* ══════════════════════════════════════════
+   STARS BACKGROUND
+══════════════════════════════════════════ */
+(function makeStars(){
+  const c=document.getElementById('stars');
+  for(let i=0;i<110;i++){
+    const s=document.createElement('div');s.className='st';
+    const sz=Math.random()*2.4;
+    s.style.cssText=`left:${Math.random()*100}%;top:${Math.random()*100}%;width:${sz}px;height:${sz}px;--d:${2+Math.random()*4}s;animation-delay:${Math.random()*5}s`;
+    c.appendChild(s);
   }
 })();
 
-// Init
-selectLevel('normal');
+// Init default level selection
+pickLvl('normal');
 </script>
 </body>
 </html>
